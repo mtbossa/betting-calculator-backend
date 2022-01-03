@@ -23,7 +23,7 @@ class BetableMatchTest extends TestCase
             ['*']
         );
 
-        $response = $this->post('/api/matches', [
+        $response = $this->postJson('/api/matches', [
             'team_one' => 'Pain',
             'team_two' => 'INTZ',
         ]);

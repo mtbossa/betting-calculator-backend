@@ -26,7 +26,7 @@ class BetTest extends TestCase
       'team_two' => 'Pain',
     ]);
 
-    $response = $this->post("api/matches/$match->id/bets", [
+    $response = $this->postJson("api/matches/$match->id/bets", [
       'winner_team' => 1,
       'odd' => 1.5,
       'amount' => 25, // Reais
