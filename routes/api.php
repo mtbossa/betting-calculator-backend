@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BetableMatchController;
 use App\Models\Bet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,11 +23,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return $request->user();
     });
 
-    Route::post('/matches', function (Request $request) {
-        $match = $request->user()->matches()->create([
-            'team_one' => $request->team_one,
-            'team_two' => $request->team_two,
-        ]);
+    Route::group(['prefix' => 'matches', 'as' => 'matches.'], function () {
+        Route::post('/', [BetableMatchController::class, 'store'])->name('store');
     });
 
     Route::delete('/matches/{match}', function (BetableMatch $match) {
