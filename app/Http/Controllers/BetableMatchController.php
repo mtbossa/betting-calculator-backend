@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BetableMatch;
 use Illuminate\Http\Request;
 
 class BetableMatchController extends Controller
@@ -12,5 +13,10 @@ class BetableMatchController extends Controller
             'team_one' => $request->team_one,
             'team_two' => $request->team_two,
         ]);
+    }
+
+    public function destroy(BetableMatch $match)
+    {
+        $match->delete();
     }
 }
