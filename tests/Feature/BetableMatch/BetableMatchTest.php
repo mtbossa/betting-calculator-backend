@@ -33,7 +33,7 @@ class BetableMatchTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response->assertStatus(200);
+        $response->assertJson(['team_one' => 'Pain']);
     }
 
     /** @test */
