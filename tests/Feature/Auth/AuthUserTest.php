@@ -24,4 +24,12 @@ class AuthUserTest extends TestCase
 
     $response->assertOk();
   }
+
+  /** @test */
+  public function ensure_unauthenticated_user_cannot_get_responses()
+  {
+    $response = $this->get('/api/user');
+
+    $response->assertStatus(500);
+  }
 }
