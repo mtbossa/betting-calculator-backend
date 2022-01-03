@@ -16,8 +16,10 @@ class BetableMatchTest extends TestCase
     /** @test */
     public function check_if_betable_match_can_be_created()
     {
+        $this->withoutExceptionHandling();
+        
         Sanctum::actingAs(
-            User::factory()->create(),
+            $user = User::factory()->create(),
             ['*']
         );
 
@@ -27,6 +29,9 @@ class BetableMatchTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('matches', 1);
+        $this->assertDatabaseHas('matches', [
+            'user_id' => $user->id,
+        ]);
 
         $response->assertStatus(200);
     }

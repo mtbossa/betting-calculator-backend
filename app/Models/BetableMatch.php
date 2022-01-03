@@ -9,7 +9,12 @@ class BetableMatch extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['team_one', 'team_two'];
+    protected $fillable = ['team_one', 'team_two', 'user_id'];
 
     protected $table = 'matches';
+
+    public function user()
+    {
+        $this->belongsTo(User::class);
+    }
 }

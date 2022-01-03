@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,7 @@ class CreateMatchesTable extends Migration
             $table->id();
             $table->string('team_one');
             $table->string('team_two');
+            $table->foreignIdFor(User::class)->constrained();
             $table->timestamps();
         });
     }
