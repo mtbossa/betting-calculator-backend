@@ -16,6 +16,7 @@ class CreateBetsTable extends Migration
     {
         Schema::create('bets', function (Blueprint $table) {
             $table->id();
+            $table->tinyInteger('winner_team', false, true);
             $table->decimal('odd', 5, 2, true);
             $table->decimal('amount', 10, 2, true);
             $table->char('currency', 3);

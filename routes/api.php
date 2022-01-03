@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/matches/{match}/bets', function (BetableMatch $match, Request $request) {
         $bet = $match->bets()->create([
+            'winner_team' => $request->winner_team,
             'odd' => $request->odd,
             'amount' => $request->amount,
             'currency' => $request->currency,

@@ -27,6 +27,7 @@ class BetTest extends TestCase
     ]);
 
     $response = $this->post("api/matches/$match->id/bets", [
+      'winner_team' => 1,
       'odd' => 1.5,
       'amount' => 25, // Reais
       'currency' => 'BRL'
@@ -34,6 +35,7 @@ class BetTest extends TestCase
 
     $this->assertDatabaseCount('bets', 1);
     $this->assertDatabaseHas('bets', [
+      'winner_team' => 1,
       'match_id' => $match->id,
     ]);
 
@@ -51,13 +53,14 @@ class BetTest extends TestCase
     );
 
     $match = $user->matches()->create([
-        'team_one' => 'INTZ',
-        'team_two' => 'Pain',
+      'team_one' => 'INTZ',
+      'team_two' => 'Pain',
     ]);
 
     $bet = $match->bets()->create([
+      'winner_team' => 1,
       'odd' => 1.5,
-      'amount' => 25, // Reais
+      'amount' => 25,
       'currency' => 'BRL',
     ]);
 

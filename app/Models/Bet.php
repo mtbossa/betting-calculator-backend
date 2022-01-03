@@ -9,7 +9,7 @@ class Bet extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['odd', 'amount', 'currency'];
+    protected $fillable = ['winner_team', 'odd', 'amount', 'currency'];
 
     public function match()
     {
