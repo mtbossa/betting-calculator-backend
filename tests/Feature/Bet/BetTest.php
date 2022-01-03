@@ -16,8 +16,6 @@ class BetTest extends TestCase
   /** @test */
   public function check_if_bet_can_be_created()
   {
-    $this->withoutExceptionHandling();
-
     Sanctum::actingAs(
       $user = User::factory()->create(),
       ['*']
@@ -40,5 +38,31 @@ class BetTest extends TestCase
     ]);
 
     $response->assertStatus(200);
+  }
+
+  /** @test */
+  public function check_if_bet_can_be_deleted()
+  {
+    $this->withoutExceptionHandling();
+
+    Sanctum::actingAs(
+      $user = User::factory()->create(),
+      ['*']
+    );
+
+    $match = $user->matches()->create([
+        'team_one' => 'INTZ',
+        'team_two' => 'Pain',
+    ]);
+
+    $bet = $match->bets()->create([
+      'odd' => 1.5,
+      'amount' => 25, // Reais
+      'currency' => 'BRL',
+    ]);
+
+    $this->delete("/api/matches/$match->id/bets/$bet->id");
+
+    $this->assertDeleted($bet);
   }
 }
