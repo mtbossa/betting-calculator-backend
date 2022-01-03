@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Models\BetableMatch;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::post('/matches', function (Request $request) {
+        $match = BetableMatch::create([
+            'team_one' => $request->team_one,
+            'team_two' => $request->team_two,
+        ]);
+    });
+
+    Route::delete('/matches/{match}', function (BetableMatch $match) {
+        $match->delete();
+    });
 });
