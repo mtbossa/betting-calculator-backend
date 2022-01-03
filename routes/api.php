@@ -23,7 +23,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::post('/matches', function (Request $request) {
-        $match = Auth::user()->matches()->create([
+        $match = $request->user()->matches()->create([
             'team_one' => $request->team_one,
             'team_two' => $request->team_two,
         ]);
