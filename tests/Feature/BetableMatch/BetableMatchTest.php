@@ -42,16 +42,14 @@ class BetableMatchTest extends TestCase
         // $this->withoutExceptionHandling();
 
         Sanctum::actingAs(
-            User::factory()->create(),
+            $user = User::factory()->create(),
             ['*']
         );
 
-        $this->post('/api/matches', [
-            'team_one' => 'Pain',
-            'team_two' => 'INTZ',
+        $match = $user->matches()->create([
+            'team_one' => 'INTZ',
+            'team_two' => 'Pain',
         ]);
-
-        $match = BetableMatch::first();
 
         $this->delete("/api/matches/$match->id");
 
