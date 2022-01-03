@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Bet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\BetableMatch;
@@ -30,5 +31,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::delete('/matches/{match}', function (BetableMatch $match) {
         $match->delete();
+    });
+
+    Route::post('/matches/{match}/bets', function (BetableMatch $match, Request $request) {
+        $bet = $match->bets()->create([
+            'odd' => $request->odd,
+            'amount' => $request->amount,
+            'currency' => $request->currency,
+        ]);
     });
 });
