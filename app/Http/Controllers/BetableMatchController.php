@@ -13,6 +13,8 @@ class BetableMatchController extends Controller
             'team_one' => $request->team_one,
             'team_two' => $request->team_two,
         ]);
+
+        return $match;
     }
 
     public function destroy(BetableMatch $match)
