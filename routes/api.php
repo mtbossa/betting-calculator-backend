@@ -24,11 +24,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::group(['prefix' => 'matches', 'as' => 'matches.'], function () {
+        Route::get('/', [BetableMatchController::class, 'index'])->name('index');
         Route::post('/', [BetableMatchController::class, 'store'])->name('store');
         Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
     });
-
-
 
     Route::post('/matches/{match}/bets', function (BetableMatch $match, Request $request) {
         $bet = $match->bets()->create([

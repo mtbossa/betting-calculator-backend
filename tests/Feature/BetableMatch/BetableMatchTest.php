@@ -16,8 +16,6 @@ class BetableMatchTest extends TestCase
     /** @test */
     public function check_if_betable_match_can_be_created()
     {
-        $this->withoutExceptionHandling();
-
         Sanctum::actingAs(
             $user = User::factory()->create(),
             ['*']
@@ -34,6 +32,32 @@ class BetableMatchTest extends TestCase
         ]);
 
         $response->assertJson(['team_one' => 'Pain']);
+    }
+
+    /** @test */
+    public function check_if_can_get_all_betable_matches()
+    {
+        $this->withoutExceptionHandling();
+
+        Sanctum::actingAs(
+            $user = User::factory()->create(),
+            ['*']
+        );
+
+        $match = $user->matches()->createMany([
+            [
+                'team_one' => 'INTZ',
+                'team_two' => 'Pain',
+            ],
+            [
+                'team_one' => 'Vitality',
+                'team_two' => 'VP',
+            ],
+        ]);
+
+        $response = $this->get('/api/matches');
+
+        $response->assertJsonCount(2);
     }
 
     /** @test */

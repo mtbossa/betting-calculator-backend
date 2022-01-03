@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class BetableMatchController extends Controller
 {
+    public function index(Request $request)
+    {
+        return BetableMatch::all();
+    }
+
     public function store(Request $request)
     {
         $match = $request->user()->matches()->create([
