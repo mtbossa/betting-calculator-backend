@@ -5,6 +5,7 @@ use App\Models\Bet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\BetableMatch;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -19,8 +20,8 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+    Route::get('/users', function (Request $request) {
+        return User::all();
     });
 
     Route::group(['prefix' => 'matches', 'as' => 'matches.'], function () {
