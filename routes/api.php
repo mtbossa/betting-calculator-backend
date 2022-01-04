@@ -24,6 +24,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         return User::all();
     });
 
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
     Route::group(['prefix' => 'matches', 'as' => 'matches.'], function () {
         Route::get('/', [BetableMatchController::class, 'index'])->name('index');
         Route::post('/', [BetableMatchController::class, 'store'])->name('store');
