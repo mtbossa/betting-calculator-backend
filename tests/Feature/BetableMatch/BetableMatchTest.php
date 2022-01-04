@@ -31,7 +31,11 @@ class BetableMatchTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response->assertJson(['team_one' => 'Pain']);
+        $response->assertStatus(201);
+        $response->assertJson([
+            'team_one' => 'Pain',
+            'team_two' => 'INTZ',
+        ]);
     }
 
     /** @test */
@@ -44,7 +48,7 @@ class BetableMatchTest extends TestCase
             ['*']
         );
 
-        $match = $user->matches()->createMany([
+        $form_data = [
             [
                 'team_one' => 'INTZ',
                 'team_two' => 'Pain',
@@ -53,11 +57,14 @@ class BetableMatchTest extends TestCase
                 'team_one' => 'Vitality',
                 'team_two' => 'VP',
             ],
-        ]);
+        ];
+
+        $match = $user->matches()->createMany($form_data);
 
         $response = $this->get('/api/matches');
 
         $response->assertJsonCount(2);
+        $response->assertJson($form_data);
     }
 
     /** @test */
