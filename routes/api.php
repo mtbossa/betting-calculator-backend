@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'matches', 'as' => 'betable_matches.'], function () {
         Route::get('/', [BetableMatchController::class, 'index'])->name('index');
         Route::post('/', [BetableMatchController::class, 'store'])->name('store');
+        Route::get('/{match}', [BetableMatchController::class, 'show'])->name('show');
         Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
     });
 

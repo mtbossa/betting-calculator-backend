@@ -11,6 +11,8 @@ class BetableMatch extends Model
 
     protected $fillable = ['team_one', 'team_two'];
 
+    protected $with = ['bets'];
+
     protected $table = 'matches';
 
     public function user()

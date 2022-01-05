@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\BetableMatch;
 
+use App\Models\Bet;
 use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,7 +42,6 @@ class BetableMatchTest extends TestCase
     /** @test */
     public function fetch_all_betable_matches()
     {
-        $this->withoutExceptionHandling();
 
         Sanctum::actingAs(
             $user = User::factory()->create(),
@@ -56,12 +56,24 @@ class BetableMatchTest extends TestCase
         $response->assertJson($matches->toArray());
     }
 
-        $match = $user->matches()->createMany($form_data);
+    /** @test */
+    public function fetch_single_betable_match_with_bets()
+    {
+        // $this->withoutExceptionHandling();
+        Sanctum::actingAs(
+            $user = User::factory()->create(),
+            ['*']
+        );
 
-        $response = $this->get(route('betable_matches.index'));
+        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+        $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
-        $response->assertJsonCount(2);
-        $response->assertJson($form_data);
+        $response = $this->getJson(route('betable_matches.show', $match->id));
+
+
+        
+        $response->assertJson($match->toArray());
+        $response->assertJsonPath('bets.0.odd', Bet::first()->odd);
     }
 
     /** @test */

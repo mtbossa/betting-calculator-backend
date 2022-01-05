@@ -22,6 +22,11 @@ class BetableMatchController extends Controller
         return $match;
     }
 
+    public function show(BetableMatch $match)
+    {
+        return $match->toJson();
+    }
+
     public function destroy(BetableMatch $match)
     {
         $match->delete();
