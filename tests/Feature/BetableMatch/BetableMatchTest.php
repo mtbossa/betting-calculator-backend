@@ -21,7 +21,7 @@ class BetableMatchTest extends TestCase
             ['*']
         );
 
-        $response = $this->postJson('/api/matches', [
+        $response = $this->postJson(route('betable_matches.store'), [
             'team_one' => 'Pain',
             'team_two' => 'INTZ',
         ]);
@@ -61,7 +61,7 @@ class BetableMatchTest extends TestCase
 
         $match = $user->matches()->createMany($form_data);
 
-        $response = $this->get('/api/matches');
+        $response = $this->get(route('betable_matches.index'));
 
         $response->assertJsonCount(2);
         $response->assertJson($form_data);
@@ -82,7 +82,7 @@ class BetableMatchTest extends TestCase
             'team_two' => 'Pain',
         ]);
 
-        $this->delete("/api/matches/$match->id");
+        $this->delete(route('betable_matches.destroy', $match->id));
 
         $this->assertDeleted($match);
     }
