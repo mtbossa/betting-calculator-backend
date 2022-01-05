@@ -48,16 +48,13 @@ class BetableMatchTest extends TestCase
             ['*']
         );
 
-        $form_data = [
-            [
-                'team_one' => 'INTZ',
-                'team_two' => 'Pain',
-            ],
-            [
-                'team_one' => 'Vitality',
-                'team_two' => 'VP',
-            ],
-        ];
+        $matches = BetableMatch::factory(2)->create(['user_id' => $user->id]);
+
+        $response = $this->getJson(route('betable_matches.index'));
+
+        $response->assertJsonCount(2);
+        $response->assertJson($matches->toArray());
+    }
 
         $match = $user->matches()->createMany($form_data);
 
