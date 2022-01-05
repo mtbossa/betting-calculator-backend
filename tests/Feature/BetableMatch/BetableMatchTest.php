@@ -39,7 +39,7 @@ class BetableMatchTest extends TestCase
     }
 
     /** @test */
-    public function check_if_can_get_all_betable_matches()
+    public function fetch_all_betable_matches()
     {
         $this->withoutExceptionHandling();
 
