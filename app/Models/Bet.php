@@ -11,7 +11,7 @@ class Bet extends Model
 
     protected $fillable = ['winner_team', 'odd', 'amount', 'currency'];
 
-    protected $casts = ['odd' => 'float', 'amount' => 'float'];
+    protected $casts = ['winner_team' => 'int', 'odd' => 'float', 'amount' => 'float'];
 
     public function match()
     {
