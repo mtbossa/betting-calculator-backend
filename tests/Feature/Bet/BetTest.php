@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Bet;
 
+use App\Models\Bet;
 use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,10 +22,7 @@ class BetTest extends TestCase
       ['*']
     );
 
-    $match = $user->matches()->create([
-      'team_one' => 'INTZ',
-      'team_two' => 'Pain',
-    ]);
+    $match = BetableMatch::factory()->create(['user_id' => $user->id]);
 
     $response = $this->postJson("api/matches/$match->id/bets", [
       'winner_team' => 1,
@@ -39,7 +37,8 @@ class BetTest extends TestCase
       'match_id' => $match->id,
     ]);
 
-    $response->assertStatus(200);
+    $response->assertStatus(201);
+    $response->assertJson(Bet::first()->toArray());
   }
 
   /** @test */

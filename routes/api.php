@@ -42,6 +42,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             'amount' => $request->amount,
             'currency' => $request->currency,
         ]);
+
+        return $bet;
     });
 
     Route::delete('/matches/{match}/bets/{bet}', function (BetableMatch $match, Bet $bet) {
