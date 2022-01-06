@@ -69,8 +69,6 @@ class BetableMatchTest extends TestCase
         $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
         $response = $this->getJson(route('betable_matches.show', $match->id));
-
-
         
         $response->assertJson($match->toArray());
         $response->assertJsonPath('bets.0.odd', Bet::first()->odd);

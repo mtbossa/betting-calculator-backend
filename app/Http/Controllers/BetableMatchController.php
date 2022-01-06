@@ -24,7 +24,7 @@ class BetableMatchController extends Controller
 
     public function show(BetableMatch $match)
     {
-        return $match->toJson();
+        return response()->json($match->toArray(), 200, [], JSON_PRESERVE_ZERO_FRACTION);
     }
 
     public function destroy(BetableMatch $match)
