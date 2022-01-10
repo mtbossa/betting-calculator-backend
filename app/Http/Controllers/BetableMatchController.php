@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBetableMatchRequest;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
 
 class BetableMatchController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         return BetableMatch::all();
     }
 
-    public function store(Request $request)
+    public function store(StoreBetableMatchRequest $request)
     {
         $match = $request->user()->matches()->create([
             'team_one' => $request->team_one,
