@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BetableMatchController;
+use App\Http\Controllers\BetController;
 use App\Models\Bet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,18 +37,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
     });
 
-    Route::post('/matches/{match}/bets', function (BetableMatch $match, Request $request) {
-        $bet = $match->bets()->create([
-            'winner_team' => $request->winner_team,
-            'odd' => $request->odd,
-            'amount' => $request->amount,
-            'currency' => $request->currency,
-        ]);
-
-        return $bet;
-    });
-
-    Route::delete('/matches/{match}/bets/{bet}', function (BetableMatch $match, Bet $bet) {
-        $bet->delete();
-    });
+    Route::apiResource('matches.bets', BetController::class);
 });

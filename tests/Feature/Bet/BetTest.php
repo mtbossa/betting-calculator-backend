@@ -24,12 +24,13 @@ class BetTest extends TestCase
 
     $match = BetableMatch::factory()->create(['user_id' => $user->id]);
 
-    $response = $this->postJson("api/matches/$match->id/bets", [
+    $response = $this->postJson(route('matches.bets.store', [
+      'match' => $match->id,
       'winner_team' => 1,
       'odd' => 1.5,
       'amount' => 25, // Reais
       'currency' => 'BRL'
-    ]);
+    ]));
 
     $this->assertDatabaseCount('bets', 1);
     $this->assertDatabaseHas('bets', [
@@ -42,6 +43,36 @@ class BetTest extends TestCase
   }
 
   /** @test */
+  public function check_if_bet_can_be_updated()
+  {
+    // $this->withoutExceptionHandling();
+
+    Sanctum::actingAs(
+      $user = User::factory()->create(),
+      ['*']
+    );
+
+    $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+
+    $bet = Bet::factory()->create(['match_id' => $match->id]);
+
+    $update_values = [
+      'odd' => 2,
+      'amount' => 30,
+    ];
+
+    $response = $this->putJson(route('matches.bets.update', [
+      'match' => $match->id,
+      'bet' => $bet->id,
+      'odd' => 2,
+      'amount' => 30,
+    ]));
+
+    $response->assertJsonFragment($update_values);
+    $this->assertDatabaseHas('bets', $update_values);
+  }
+
+  /** @test */
   public function check_if_bet_can_be_deleted()
   {
     $this->withoutExceptionHandling();
@@ -51,20 +82,55 @@ class BetTest extends TestCase
       ['*']
     );
 
-    $match = $user->matches()->create([
-      'team_one' => 'INTZ',
-      'team_two' => 'Pain',
-    ]);
+    $match = BetableMatch::factory()->create(['user_id' => $user->id]);
 
-    $bet = $match->bets()->create([
-      'winner_team' => 1,
-      'odd' => 1.5,
-      'amount' => 25,
-      'currency' => 'BRL',
-    ]);
+    $bet = Bet::factory()->create(['match_id' => $match->id]);
 
-    $this->delete("/api/matches/$match->id/bets/$bet->id");
+    $this->delete(route('matches.bets.destroy', ['match' => $match->id, 'bet' => $bet->id]));
 
     $this->assertDeleted($bet);
+  }
+
+  /** @test */
+  public function odd_winner_team_and_amount_are_required()
+  {
+    Sanctum::actingAs(
+      $user = User::factory()->create(),
+      ['*']
+    );
+
+    $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+
+    // Creating bet
+    $response = $this->postJson(route('matches.bets.store', [
+      'match' => $match->id,
+      'winner_team' => '',
+      'odd' => '',
+      'amount' => ''
+    ]));
+
+    $response->assertJsonValidationErrors([
+      'winner_team' => 'The winner team field is required.',
+      'odd' => 'The odd field is required.',
+      'amount' => 'The amount field is required.',
+    ]);
+
+    // Updating match
+    $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+    $bet = Bet::factory()->create(['match_id' => $match->id]);
+
+    $response = $this->putJson(route('matches.bets.update', [
+      'match' => $match->id, 'winner_team' => '',
+      'bet' => $bet->id,
+      'winner_team' => '',
+      'odd' => '',
+      'amount' => ''
+    ]));
+
+    $response->assertJsonValidationErrors([
+      'winner_team' => 'The winner team field is required.',
+      'odd' => 'The odd field is required.',
+      'amount' => 'The amount field is required.',
+    ]);
   }
 }
