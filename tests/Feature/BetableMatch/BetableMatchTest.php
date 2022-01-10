@@ -67,7 +67,7 @@ class BetableMatchTest extends TestCase
         $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
         $response = $this->getJson(route('betable_matches.show', $match->id));
-        
+
         $response->assertJson($match->toArray());
         $response->assertJsonPath('bets.0.odd', Bet::first()->odd);
     }
@@ -84,9 +84,9 @@ class BetableMatchTest extends TestCase
         $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
         // Fetch single match
-        $response = $this->getJson(route('betable_matches.show', $match->id));        
+        $response = $this->getJson(route('betable_matches.show', $match->id));
         $response->assertJson($match->toArray());
-        $response->assertJsonPath('bets.0.odd', Bet::first()->odd);        
+        $response->assertJsonPath('bets.0.odd', Bet::first()->odd);
 
         // Fetch all matches
         $response = $this->getJson(route('betable_matches.index'));
@@ -95,26 +95,37 @@ class BetableMatchTest extends TestCase
     }
 
     /** @test */
-    public function both_team_names_are_required() 
+    public function both_team_names_are_required()
     {
         Sanctum::actingAs(
             $user = User::factory()->create(),
             ['*']
         );
 
+        // Creating match
         $response = $this->postJson(route('betable_matches.store'), []);
+        $response->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
 
+        // Updating match
+        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+        $update_values = [
+            'team_one' => '',
+            'team_two' => ''
+        ];
+
+        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
         $response->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
     }
 
     /** @test */
-    public function team_name_cant_be_greater_then_50_char() 
+    public function team_name_cant_be_greater_then_50_char()
     {
         Sanctum::actingAs(
             $user = User::factory()->create(),
             ['*']
         );
 
+        // Creating match
         $response = $this->postJson(route('betable_matches.store'), [
             'team_one' => $this->faker->sentence(49),
             'team_two' => $this->faker->sentence(49)
@@ -122,8 +133,40 @@ class BetableMatchTest extends TestCase
 
         $response->assertJsonValidationErrors([
             'team_one' => 'The team one must not be greater than 50 characters.',
-             'team_two' => 'The team two must not be greater than 50 characters.'
+            'team_two' => 'The team two must not be greater than 50 characters.'
         ]);
+
+        // Updating match
+        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+        $update_values = ['team_one' => $this->faker->sentence(49), 'team_two' => $this->faker->sentence(49)];
+
+        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
+
+        $response->assertJsonValidationErrors([
+            'team_one' => 'The team one must not be greater than 50 characters.',
+            'team_two' => 'The team two must not be greater than 50 characters.'
+        ]);
+    }
+
+    /** @test */
+    public function check_if_betable_match_can_be_updated()
+    {
+
+        $this->withoutExceptionHandling();
+        Sanctum::actingAs(
+            $user = User::factory()->create(),
+            ['*']
+        );
+
+        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+
+        $update_values = ['team_one' => 'INTZ', 'team_two' => 'Pain'];
+
+        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
+
+        $response->assertOk();
+        $response->assertJsonFragment($update_values);
+        $this->assertDatabaseHas('matches', $update_values);
     }
 
     /** @test */

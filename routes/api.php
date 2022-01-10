@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/', [BetableMatchController::class, 'index'])->name('index');
         Route::post('/', [BetableMatchController::class, 'store'])->name('store');
         Route::get('/{match}', [BetableMatchController::class, 'show'])->name('show');
+        Route::put('/{match}', [BetableMatchController::class, 'update'])->name('update');
         Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
     });
 
