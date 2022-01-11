@@ -54,17 +54,15 @@ class BetTest extends TestCase
 
     $bet = Bet::factory()->create(['match_id' => $match->id]);
 
-    $this->putJson(route('matches.bets.update', ['match' => $match->id, 'bet' => $bet->id]), [
+    $update_values = [
       'odd' => 2,
       'amount' => 30,
-    ])->assertJsonFragment([
-      'odd' => 2,
-      'amount' => 30,
-    ]);
-    $this->assertDatabaseHas('bets', [
-      'odd' => 2,
-      'amount' => 30,
-    ]);
+    ];
+
+    $this->putJson(route('matches.bets.update', ['match' => $match->id, 'bet' => $bet->id]), $update_values)
+      ->assertJsonFragment($update_values);
+
+    $this->assertDatabaseHas('bets', $update_values);
   }
 
   /** @test */
