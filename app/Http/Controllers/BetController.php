@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BetRequest;
+use App\Http\Requests\StoreBetRequest;
+use App\Http\Requests\UpdateBetRequest;
 use App\Models\Bet;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
@@ -25,7 +27,7 @@ class BetController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(BetableMatch $match, BetRequest $request)
+    public function store(BetableMatch $match, StoreBetRequest $request)
     {  
         $bet = $match->bets()->create([
             'winner_team' => $request->winner_team,
@@ -55,7 +57,7 @@ class BetController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(BetRequest $request, BetableMatch $match, Bet $bet)
+    public function update(UpdateBetRequest $request, BetableMatch $match, Bet $bet)
     {
         $bet->odd = $request->odd;
         $bet->amount = $request->amount;

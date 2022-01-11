@@ -12,177 +12,136 @@ use Tests\TestCase;
 
 class BetableMatchTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+  use RefreshDatabase, WithFaker;
 
-    /** @test */
-    public function check_if_betable_match_can_be_created()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+  private $user;
 
-        $response = $this->postJson(route('betable_matches.store'), [
-            'team_one' => 'Pain',
-            'team_two' => 'INTZ',
-        ]);
+  public function setUp(): void
+  {
+    parent::setUp();
 
-        $this->assertDatabaseCount('matches', 1);
-        $this->assertDatabaseHas('matches', [
-            'user_id' => $user->id,
-        ]);
+    $this->user = Sanctum::actingAs(
+      User::factory()->create(),
+      ['*']
+    );
+  }
 
-        $response->assertStatus(201);
-        $response->assertJson([
-            'team_one' => 'Pain',
-            'team_two' => 'INTZ',
-        ]);
-    }
+  /** @test */
+  public function check_if_betable_match_can_be_created()
+  {
+    $match = BetableMatch::factory()->make();
+    $this->postJson(route('betable_matches.store'), $match->toArray())
+      ->assertCreated()
+      ->assertJson($match->toArray());
 
-    /** @test */
-    public function fetch_all_betable_matches()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+    $this->assertDatabaseCount('matches', 1);
+    $this->assertDatabaseHas('matches', [
+      'user_id' => $this->user->id,
+    ]);
+  }
 
-        $matches = BetableMatch::factory(2)->create(['user_id' => $user->id]);
+  /** @test */
+  public function fetch_all_betable_matches()
+  {
+    $matches = BetableMatch::factory(2)->create(['user_id' => $this->user->id]);
 
-        $response = $this->getJson(route('betable_matches.index'));
+    $this->getJson(route('betable_matches.index'))
+      ->assertJsonCount(2)
+      ->assertJson($matches->toArray());
+  }
 
-        $response->assertJsonCount(2);
-        $response->assertJson($matches->toArray());
-    }
+  /** @test */
+  public function fetch_single_betable_match_with_bets()
+  {
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
+    $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
-    /** @test */
-    public function fetch_single_betable_match_with_bets()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+    $this->getJson(route('betable_matches.show', $match->id))
+      ->assertJson($match->toArray())
+      ->assertJsonPath('bets.0.odd', Bet::first()->odd);
+  }
 
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-        $bets = Bet::factory(10)->create(['match_id' => $match->id]);
+  /** @test */
+  public function ensure_fetched_matches_always_have_bets()
+  {
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
+    $bets = Bet::factory(10)->create(['match_id' => $match->id]);
 
-        $response = $this->getJson(route('betable_matches.show', $match->id));
+    // Fetch single match
+    $this->getJson(route('betable_matches.show', $match->id))
+      ->assertJson($match->toArray())
+      ->assertJsonPath('bets.0.odd', Bet::first()->odd);
 
-        $response->assertJson($match->toArray());
-        $response->assertJsonPath('bets.0.odd', Bet::first()->odd);
-    }
+    // Fetch all matches
+    $this->getJson(route('betable_matches.index'))
+      ->assertJson([0 => $match->toArray()])
+      ->assertJsonPath('0.bets.0.odd', Bet::first()->odd);
+  }
 
-    /** @test */
-    public function ensure_fetched_matches_always_have_bets()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+  /** @test */
+  public function both_team_names_are_required()
+  {
+    // Creating match
+    $this->postJson(route('betable_matches.store'), [])
+      ->assertUnprocessable()
+      ->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
 
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-        $bets = Bet::factory(10)->create(['match_id' => $match->id]);
+    // Updating match
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
+    $update_values = [
+      'team_one' => '',
+      'team_two' => ''
+    ];
 
-        // Fetch single match
-        $response = $this->getJson(route('betable_matches.show', $match->id));
-        $response->assertJson($match->toArray());
-        $response->assertJsonPath('bets.0.odd', Bet::first()->odd);
+    $this->putJson(route('betable_matches.update', $match->id), $update_values)
+      ->assertUnprocessable()
+      ->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
+  }
 
-        // Fetch all matches
-        $response = $this->getJson(route('betable_matches.index'));
-        $response->assertJson([0 => $match->toArray()]);
-        $response->assertJsonPath('0.bets.0.odd', Bet::first()->odd);
-    }
+  /** @test */
+  public function team_name_cant_be_greater_then_50_char()
+  {
+    // Creating match
+    $this->postJson(route('betable_matches.store'), [
+      'team_one' => $this->faker->sentence(49),
+      'team_two' => $this->faker->sentence(49)
+    ])->assertJsonValidationErrors([
+      'team_one' => 'The team one must not be greater than 50 characters.',
+      'team_two' => 'The team two must not be greater than 50 characters.'
+    ]);
 
-    /** @test */
-    public function both_team_names_are_required()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+    // Updating match
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
+    $update_values = ['team_one' => $this->faker->sentence(49), 'team_two' => $this->faker->sentence(49)];
 
-        // Creating match
-        $response = $this->postJson(route('betable_matches.store'), []);
-        $response->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
+    $this->putJson(route('betable_matches.update', $match->id), $update_values)
+      ->assertJsonValidationErrors([
+        'team_one' => 'The team one must not be greater than 50 characters.',
+        'team_two' => 'The team two must not be greater than 50 characters.'
+      ]);
+  }
 
-        // Updating match
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-        $update_values = [
-            'team_one' => '',
-            'team_two' => ''
-        ];
+  /** @test */
+  public function check_if_betable_match_can_be_updated()
+  {
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
 
-        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
-        $response->assertJsonValidationErrors(['team_one' => 'The team one field is required.', 'team_two' => 'The team two field is required.']);
-    }
+    $update_values = ['team_one' => 'INTZ', 'team_two' => 'Pain'];
 
-    /** @test */
-    public function team_name_cant_be_greater_then_50_char()
-    {
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
+    $this->putJson(route('betable_matches.update', $match->id), $update_values)
+      ->assertOk()
+      ->assertJsonFragment($update_values);
+    $this->assertDatabaseHas('matches', $update_values);
+  }
 
-        // Creating match
-        $response = $this->postJson(route('betable_matches.store'), [
-            'team_one' => $this->faker->sentence(49),
-            'team_two' => $this->faker->sentence(49)
-        ]);
+  /** @test */
+  public function check_if_betable_match_with_bets_can_be_deleted()
+  {
+    $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
+    Bet::factory()->create(['match_id' => $match->id]);
 
-        $response->assertJsonValidationErrors([
-            'team_one' => 'The team one must not be greater than 50 characters.',
-            'team_two' => 'The team two must not be greater than 50 characters.'
-        ]);
-
-        // Updating match
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-        $update_values = ['team_one' => $this->faker->sentence(49), 'team_two' => $this->faker->sentence(49)];
-
-        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
-
-        $response->assertJsonValidationErrors([
-            'team_one' => 'The team one must not be greater than 50 characters.',
-            'team_two' => 'The team two must not be greater than 50 characters.'
-        ]);
-    }
-
-    /** @test */
-    public function check_if_betable_match_can_be_updated()
-    {
-
-        $this->withoutExceptionHandling();
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
-
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-
-        $update_values = ['team_one' => 'INTZ', 'team_two' => 'Pain'];
-
-        $response = $this->putJson(route('betable_matches.update', $match->id), $update_values);
-
-        $response->assertOk();
-        $response->assertJsonFragment($update_values);
-        $this->assertDatabaseHas('matches', $update_values);
-    }
-
-    /** @test */
-    public function check_if_betable_match_with_bets_can_be_deleted()
-    {
-        $this->withoutExceptionHandling();
-
-        Sanctum::actingAs(
-            $user = User::factory()->create(),
-            ['*']
-        );
-
-        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
-        $bet = Bet::factory()->create(['match_id' => $match->id]);
-
-        $this->delete(route('betable_matches.destroy', $match->id));
-        $this->assertDeleted($match);
-    }
+    $this->delete(route('betable_matches.destroy', $match->id));
+    $this->assertDatabaseMissing('bets', ['match_id' => $match->id]);
+    $this->assertDeleted($match);
+  }
 }

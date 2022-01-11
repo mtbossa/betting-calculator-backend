@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BetableMatchRequest;
+use App\Models\Bet;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
 
@@ -38,11 +39,9 @@ class BetableMatchController extends Controller
     }
 
     public function destroy(BetableMatch $match)
-    {
-        foreach($match->bets as $bet) {
-            $bet->delete();
-        }
-        
+    {              
         $match->delete();
+
+        return response(['message' => 'Match deleted.']);
     }
 }
