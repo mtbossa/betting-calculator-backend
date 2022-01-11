@@ -39,6 +39,10 @@ class BetableMatchController extends Controller
 
     public function destroy(BetableMatch $match)
     {
+        foreach($match->bets as $bet) {
+            $bet->delete();
+        }
+        
         $match->delete();
     }
 }

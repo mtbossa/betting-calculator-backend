@@ -170,20 +170,19 @@ class BetableMatchTest extends TestCase
     }
 
     /** @test */
-    public function check_if_betable_match_can_be_deleted()
+    public function check_if_betable_match_with_bets_can_be_deleted()
     {
+        $this->withoutExceptionHandling();
+
         Sanctum::actingAs(
             $user = User::factory()->create(),
             ['*']
         );
 
-        $match = $user->matches()->create([
-            'team_one' => 'INTZ',
-            'team_two' => 'Pain',
-        ]);
+        $match = BetableMatch::factory()->create(['user_id' => $user->id]);
+        $bet = Bet::factory()->create(['match_id' => $match->id]);
 
         $this->delete(route('betable_matches.destroy', $match->id));
-
         $this->assertDeleted($match);
     }
 }
