@@ -37,5 +37,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
     });
 
-    Route::apiResource('matches.bets', BetController::class);
+    Route::apiResource('matches.bets', BetController::class)->shallow();
 });

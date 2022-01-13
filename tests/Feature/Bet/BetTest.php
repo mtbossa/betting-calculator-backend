@@ -59,7 +59,7 @@ class BetTest extends TestCase
       'amount' => 30,
     ];
 
-    $this->putJson(route('matches.bets.update', ['match' => $match->id, 'bet' => $bet->id]), $update_values)
+    $this->putJson(route('bets.update', ['match' => $match->id, 'bet' => $bet->id]), $update_values)
       ->assertJsonFragment($update_values);
 
     $this->assertDatabaseHas('bets', $update_values);
@@ -71,7 +71,7 @@ class BetTest extends TestCase
     $match = BetableMatch::factory()->create(['user_id' => $this->user->id]);
     $bet = Bet::factory()->create(['match_id' => $match->id]);
 
-    $this->delete(route('matches.bets.destroy', ['match' => $match->id, 'bet' => $bet->id]));
+    $this->delete(route('bets.destroy', ['match' => $match->id, 'bet' => $bet->id]));
 
     $this->assertDeleted($bet);
     $this->assertDatabaseHas('matches', ['id' => $match->id]);
@@ -102,7 +102,7 @@ class BetTest extends TestCase
 
     $bet = Bet::factory()->create(['match_id' => $match->id]);
 
-    $this->putJson(route('matches.bets.update', ['match' => $match->id, 'bet' => $bet->id]), [
+    $this->putJson(route('bets.update', ['match' => $match->id, 'bet' => $bet->id]), [
       'odd' => '',
       'amount' => '',
     ])->assertJsonMissingValidationErrors(['winner_team'])
