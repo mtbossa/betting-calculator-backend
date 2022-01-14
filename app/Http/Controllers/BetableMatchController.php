@@ -9,39 +9,60 @@ use Illuminate\Http\Request;
 
 class BetableMatchController extends Controller
 {
-    public function index()
-    {
-        return BetableMatch::all();
+  public function index(Request $request)
+  {
+    if ($request->with_bets) {
+      return BetableMatch::with("bets")->get();
     }
 
-    public function store(BetableMatchRequest $request)
-    {
-        $match = $request->user()->matches()->create([
-            'team_one' => $request->team_one,
-            'team_two' => $request->team_two,
-        ]);
+    return BetableMatch::all();
+  }
 
-        return $match;
+  public function store(BetableMatchRequest $request)
+  {
+    $match = $request
+      ->user()
+      ->matches()
+      ->create([
+        "team_one" => $request->team_one,
+        "team_two" => $request->team_two,
+      ]);
+
+    return $match;
+  }
+
+  public function show(BetableMatch $match, Request $request)
+  {
+    if ($request->with_bets) {
+      return response()->json(
+        $match->load("bets")->toArray(),
+        200,
+        [],
+        JSON_PRESERVE_ZERO_FRACTION
+      );
     }
 
-    public function show(BetableMatch $match)
-    {
-        return response()->json($match->toArray(), 200, [], JSON_PRESERVE_ZERO_FRACTION);
-    }
+    return response()->json(
+      $match->toArray(),
+      200,
+      [],
+      JSON_PRESERVE_ZERO_FRACTION
+    );
+  }
 
-    public function update(BetableMatch $match, BetableMatchRequest $request)
-    {
-        $match->team_one = $request->team_one;
-        $match->team_two = $request->team_two;
-        $match->save();
+  public function update(BetableMatch $match, BetableMatchRequest $request)
+  {
+    $match->team_one = $request->team_one;
+    $match->team_two = $request->team_two;
+    $match->save();
 
-        return $match;
-    }
+    return $match;
+  }
 
-    public function destroy(BetableMatch $match)
-    {              
-        $match->delete();
+  public function destroy(BetableMatch $match)
+  {
+    $match->delete();
 
-        return response(['message' => 'Match deleted.']);
-    }
+    return response(["message" => "Match deleted."]);
+  }
 }

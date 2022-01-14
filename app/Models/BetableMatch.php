@@ -7,21 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class BetableMatch extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = ['team_one', 'team_two'];
+  protected $fillable = ["team_one", "team_two"];
 
-    protected $with = ['bets'];
+  protected $table = "matches";
 
-    protected $table = 'matches';
+  public function user()
+  {
+    return $this->belongsTo(User::class);
+  }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function bets()
-    {
-        return $this->hasMany(Bet::class, 'match_id');
-    }
+  public function bets()
+  {
+    return $this->hasMany(Bet::class, "match_id");
+  }
 }
