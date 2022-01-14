@@ -36,4 +36,18 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    /**
+     * Default user email.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function default()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'email' => 'teste@teste.com',
+            ];
+        });
+    }
 }
