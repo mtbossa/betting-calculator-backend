@@ -117,4 +117,12 @@ class BetTest extends TestCase
       ->assertJsonMissingValidationErrors(["winner_team"])
       ->assertJsonValidationErrors(["odd", "amount"]);
   }
+
+  /** @test */
+  public function ensure_correct_response_is_returned_when_bet_not_found()
+  {
+    // $this->withoutExceptionHandling();
+    $this->get(route("bets.show", 1))
+      ->assertJson(['message' => 'Bet not found.']);    
+  }
 }

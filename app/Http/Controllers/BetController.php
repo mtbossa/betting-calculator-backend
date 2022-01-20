@@ -47,9 +47,9 @@ class BetController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function show($id)
+  public function show(Bet $bet)
   {
-    //
+    return $bet;
   }
 
   /**
@@ -76,7 +76,7 @@ class BetController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy(BetableMatch $match, Bet $bet)
+  public function destroy(Bet $bet)
   {
     $bet->delete();
 
