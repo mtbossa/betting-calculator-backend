@@ -64,10 +64,9 @@ class BetTest extends TestCase
       "amount" => 30,
     ];
 
-    $this->putJson(
-      route("bets.update", ["bet" => $bet->id]),
-      $update_values
-    )->assertJsonFragment($update_values);
+    $this->putJson(route("bets.update", ["bet" => $bet->id]), $update_values)
+      ->assertOk()
+      ->assertJsonFragment($update_values);
 
     $this->assertDatabaseHas("bets", $update_values);
   }
@@ -100,7 +99,9 @@ class BetTest extends TestCase
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
     $bet = Bet::factory()->create(["match_id" => $match->id]);
 
-    $this->delete(route("bets.destroy", ["bet" => $bet->id]));
+    $this->delete(route("bets.destroy", ["bet" => $bet->id]))
+      ->assertOk()
+      ->assertJson(["message" => "Bet deleted."]);
 
     $this->assertDeleted($bet);
     $this->assertDatabaseHas("matches", ["id" => $match->id]);

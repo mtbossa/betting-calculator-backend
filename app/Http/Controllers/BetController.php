@@ -29,9 +29,12 @@ class BetController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function store(BetableMatch $match, StoreBetRequest $request, StoreBetAction $bet_action)
-  {
-    $bet = $bet_action->handle($match, $request);    
+  public function store(
+    BetableMatch $match,
+    StoreBetRequest $request,
+    StoreBetAction $bet_action
+  ) {
+    $bet = $bet_action->handle($match, $request);
 
     return response()->json(
       $bet,
@@ -48,12 +51,13 @@ class BetController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function update(
-    UpdateBetRequest $request,
-    Bet $bet
-  ) {
-    if($bet->match->user_id !== $request->user()->id) {
-      return response()->json(['message' => 'Bet not found.'], Response::HTTP_NOT_FOUND);
+  public function update(UpdateBetRequest $request, Bet $bet)
+  {
+    if ($bet->match->user_id !== $request->user()->id) {
+      return response()->json(
+        ["message" => "Bet not found."],
+        Response::HTTP_NOT_FOUND
+      );
     }
 
     $bet->odd = $request->odd;
@@ -71,12 +75,15 @@ class BetController extends Controller
    */
   public function destroy(Bet $bet, Request $request)
   {
-    if($bet->match->user_id !== $request->user()->id) {
-      return response()->json(['message' => 'Bet not found.'], Response::HTTP_NOT_FOUND);
+    if ($bet->match->user_id !== $request->user()->id) {
+      return response()->json(
+        ["message" => "Bet not found."],
+        Response::HTTP_NOT_FOUND
+      );
     }
 
     $bet->delete();
 
-    return ["result" => "Bet deleted."];
+    return ["message" => "Bet deleted."];
   }
 }
