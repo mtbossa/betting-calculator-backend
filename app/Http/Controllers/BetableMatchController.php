@@ -7,6 +7,7 @@ use App\Models\Bet;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class BetableMatchController extends Controller
 {
@@ -34,6 +35,10 @@ class BetableMatchController extends Controller
 
   public function show(BetableMatch $match, Request $request)
   {
+    if($match->user_id !== $request->user()->id) {
+      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    }
+    
     if ($request->with_bets) {
       return response()->json(
         $match->load("bets")->toArray(),
@@ -53,6 +58,10 @@ class BetableMatchController extends Controller
 
   public function update(BetableMatch $match, BetableMatchRequest $request)
   {
+    if($match->user_id !== $request->user()->id) {
+      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    }
+
     $match->team_one = $request->team_one;
     $match->team_two = $request->team_two;
     $match->save();
@@ -60,8 +69,12 @@ class BetableMatchController extends Controller
     return $match;
   }
 
-  public function destroy(BetableMatch $match)
+  public function destroy(BetableMatch $match, Request $request)
   {
+    if($match->user_id !== $request->user()->id) {
+      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    }
+
     $match->delete();
 
     return response(["message" => "Match deleted."]);

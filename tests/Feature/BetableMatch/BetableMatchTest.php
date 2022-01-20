@@ -43,11 +43,11 @@ class BetableMatchTest extends TestCase
     $matches = BetableMatch::factory(2)->create(["user_id" => $this->user->id]);
 
     $user_2 = User::factory()->create();
-    BetableMatch::factory(2)->create(["user_id" => $user_2->id]);    
+    BetableMatch::factory(2)->create(["user_id" => $user_2->id]);
 
     $this->getJson(route("betable_matches.index"))
       ->assertJsonCount(2)
-      ->assertJsonMissingExact(['user_id' => $user_2->id])
+      ->assertJsonMissingExact(["user_id" => $user_2->id])
       ->assertJson($matches->toArray());
   }
 
@@ -55,11 +55,26 @@ class BetableMatchTest extends TestCase
   public function fetch_single_betable_match()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    $bets = Bet::factory(10)->create(["match_id" => $match->id]);
 
     $this->getJson(route("betable_matches.show", $match->id))->assertJson(
       $match->toArray()
     );
+  }
+
+  /** @test */
+  public function ensure_user_can_fetch_only_his_match()
+  {
+    // User 1 Match
+    BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    // User 2 Match
+    $user_2 = User::factory()->create();
+    $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+
+    // User 1 tries to get User 2 Match
+    $this->getJson(route("betable_matches.show", $match_2->id))
+      ->assertNotFound()
+      ->assertJson(["message" => "Match not found."]);
   }
 
   /** @test */
@@ -151,6 +166,27 @@ class BetableMatchTest extends TestCase
   }
 
   /** @test */
+  public function ensure_user_can_updated_only_his_match()
+  {
+    // User 1 Match
+    BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    // User 2 Match
+    $user_2 = User::factory()->create();
+    $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+
+    $update_values = ["team_one" => "INTZ", "team_two" => "Pain"];
+
+    $this->putJson(
+      route("betable_matches.update", $match_2->id),
+      $update_values
+    )
+      ->assertNotFound()
+      ->assertJson(["message" => "Match not found."]);
+    $this->assertDatabaseMissing("matches", $update_values);
+  }
+
+  /** @test */
   public function check_if_betable_match_with_bets_can_be_deleted()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
@@ -162,10 +198,27 @@ class BetableMatchTest extends TestCase
   }
 
   /** @test */
+  public function ensure_user_can_delete_only_his_match()
+  {
+    // User 1 Match
+    BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    // User 2 Match
+    $user_2 = User::factory()->create();
+    $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+
+    $this->delete(route("betable_matches.destroy", $match_2->id))
+      ->assertNotFound()
+      ->assertJson(["message" => "Match not found."]);
+    $this->assertDatabaseHas("matches", ["id" => $match_2->id]);
+  }
+
+  /** @test */
   public function ensure_correct_response_is_returned_when_betable_match_not_found()
   {
     $this->withoutExceptionHandling();
-    $this->get(route("betable_matches.show", 1))
-      ->assertJson(['message' => 'Match not found.']);    
+    $this->get(route("betable_matches.show", 1))->assertJson([
+      "message" => "Match not found.",
+    ]);
   }
 }
