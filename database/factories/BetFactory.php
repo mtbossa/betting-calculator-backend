@@ -18,8 +18,8 @@ class BetFactory extends Factory
 
         $odd = mt_rand($min * 10, $max * 10) / 10;
         $amount = mt_rand(5, 200);
-        $profit = $odd * $amount;
-        $real_profit  = $profit - $amount;
+        $profit = round($odd * $amount, 2);
+        $real_profit  = round($profit - $amount, 2);
         
         return [
             'winner_team' => mt_rand(1, 2),
