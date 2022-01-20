@@ -6,7 +6,6 @@ use App\Models\Bet;
 use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -36,12 +35,14 @@ class BetTest extends TestCase
         "odd" => 1.5,
         "amount" => 25.0,
       ])
-    )->assertStatus(201)->assertJson(
-      array_merge(Bet::first()->toArray(), [
-        "profit" => 37.5,
-        "real_profit" => 12.5,
-      ])
-    );
+    )
+      ->assertStatus(201)
+      ->assertJson(
+        array_merge(Bet::first()->toArray(), [
+          "profit" => 37.5,
+          "real_profit" => 12.5,
+        ])
+      );
 
     $this->assertDatabaseCount("bets", 1);
     $this->assertDatabaseHas("bets", [
@@ -72,6 +73,28 @@ class BetTest extends TestCase
   }
 
   /** @test */
+  public function ensure_user_can_update_only_his_bet()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+    Bet::factory()->create(["match_id" => $match->id]);
+
+    $user_2 = User::factory()->create();
+    $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+    $bet_2 = Bet::factory()->create(["match_id" => $match_2->id]);
+
+    $update_values = [
+      "odd" => 2,
+      "amount" => 30,
+    ];
+
+    $this->putJson(route("bets.update", ["bet" => $bet_2->id]), $update_values)
+      ->assertNotFound()
+      ->assertJson(["message" => "Bet not found."]);
+
+    $this->assertDatabaseMissing("bets", $update_values);
+  }
+
+  /** @test */
   public function check_if_bet_can_be_deleted()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
@@ -81,6 +104,23 @@ class BetTest extends TestCase
 
     $this->assertDeleted($bet);
     $this->assertDatabaseHas("matches", ["id" => $match->id]);
+  }
+
+  /** @test */
+  public function ensure_user_can_delete_only_his_bet()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+    Bet::factory()->create(["match_id" => $match->id]);
+
+    $user_2 = User::factory()->create();
+    $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+    $bet_2 = Bet::factory()->create(["match_id" => $match_2->id]);
+
+    $this->delete(route("bets.destroy", ["bet" => $bet_2->id]))
+      ->assertNotFound()
+      ->assertJson(["message" => "Bet not found."]);
+
+    $this->assertDatabaseHas("bets", ["id" => $bet_2->id]);
   }
 
   /** @test */
@@ -121,8 +161,12 @@ class BetTest extends TestCase
   /** @test */
   public function ensure_correct_response_is_returned_when_bet_not_found()
   {
-    // $this->withoutExceptionHandling();
-    $this->get(route("bets.show", 1))
-      ->assertJson(['message' => 'Bet not found.']);    
+    $this->delete(route("bets.destroy", 1))->assertJson([
+      "message" => "Bet not found.",
+    ]);
+
+    $this->put(route("bets.update", 1))->assertJson([
+      "message" => "Bet not found.",
+    ]);
   }
 }

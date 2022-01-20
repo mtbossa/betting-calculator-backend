@@ -42,17 +42,6 @@ class BetController extends Controller
   }
 
   /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function show(Bet $bet)
-  {
-    return $bet;
-  }
-
-  /**
    * Update the specified resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
@@ -63,6 +52,10 @@ class BetController extends Controller
     UpdateBetRequest $request,
     Bet $bet
   ) {
+    if($bet->user_id !== $request->user()->id) {
+      return response()->json(['message' => 'Bet not found.'], Response::HTTP_NOT_FOUND);
+    }
+
     $bet->odd = $request->odd;
     $bet->amount = $request->amount;
     $bet->save();
@@ -76,8 +69,12 @@ class BetController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy(Bet $bet)
+  public function destroy(Bet $bet, Request $request)
   {
+    if($bet->user_id !== $request->user()->id) {
+      return response()->json(['message' => 'Bet not found.'], Response::HTTP_NOT_FOUND);
+    }
+
     $bet->delete();
 
     return ["result" => "Bet deleted."];
