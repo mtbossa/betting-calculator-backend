@@ -12,12 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 class BetableMatchController extends Controller
 {
   public function index(Request $request)
-  {  
+  {
     if ($request->with_bets) {
-      return BetableMatch::with("bets")->where('user_id', Auth::user()->id)->get();
+      return BetableMatch::with("bets")
+        ->where("user_id", Auth::user()->id)
+        ->get();
     }
 
-    return BetableMatch::where('user_id', Auth::user()->id)->get();
+    return BetableMatch::where("user_id", Auth::user()->id)->get();
   }
 
   public function store(BetableMatchRequest $request)
@@ -35,10 +37,13 @@ class BetableMatchController extends Controller
 
   public function show(BetableMatch $match, Request $request)
   {
-    if($match->user_id !== $request->user()->id) {
-      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    if ($match->user_id !== $request->user()->id) {
+      return response()->json(
+        ["message" => "Match not found."],
+        Response::HTTP_NOT_FOUND
+      );
     }
-    
+
     if ($request->with_bets) {
       return response()->json(
         $match->load("bets")->toArray(),
@@ -58,8 +63,11 @@ class BetableMatchController extends Controller
 
   public function update(BetableMatch $match, BetableMatchRequest $request)
   {
-    if($match->user_id !== $request->user()->id) {
-      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    if ($match->user_id !== $request->user()->id) {
+      return response()->json(
+        ["message" => "Match not found."],
+        Response::HTTP_NOT_FOUND
+      );
     }
 
     $match->team_one = $request->team_one;
@@ -71,8 +79,11 @@ class BetableMatchController extends Controller
 
   public function destroy(BetableMatch $match, Request $request)
   {
-    if($match->user_id !== $request->user()->id) {
-      return response()->json(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+    if ($match->user_id !== $request->user()->id) {
+      return response()->json(
+        ["message" => "Match not found."],
+        Response::HTTP_NOT_FOUND
+      );
     }
 
     $match->delete();
