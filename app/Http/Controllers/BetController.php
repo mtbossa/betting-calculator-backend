@@ -61,7 +61,6 @@ class BetController extends Controller
    */
   public function update(
     UpdateBetRequest $request,
-    BetableMatch $match,
     Bet $bet
   ) {
     $bet->odd = $request->odd;
