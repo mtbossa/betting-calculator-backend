@@ -13,16 +13,20 @@ class BetFactory extends Factory
      */
     public function definition()
     {
-        $min = 0;
-        $max = 100;
-        $decimals = 2;
+        $min = 1;
+        $max = 10;
 
-        $divisor = pow(10, $decimals);
+        $odd = mt_rand($min * 10, $max * 10) / 10;
+        $amount = mt_rand(5, 200);
+        $profit = $odd * $amount;
+        $real_profit  = $profit - $amount;
+        
         return [
             'winner_team' => mt_rand(1, 2),
-            'odd' => mt_rand($min, $max * $divisor) / $divisor,
-            'amount' => mt_rand(1, 10000),
-            'currency' => 'BRL',
+            'odd' => $odd,
+            'amount' => $amount,
+            'profit' => $profit,
+            'real_profit' => $real_profit,
         ];
     }
 }

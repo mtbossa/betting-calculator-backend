@@ -19,7 +19,8 @@ class CreateBetsTable extends Migration
             $table->tinyInteger('winner_team', false, true);
             $table->decimal('odd', 5, 2, true);
             $table->decimal('amount', 10, 2, true);
-            $table->char('currency', 3);
+            $table->decimal('profit', 10, 2, true);
+            $table->decimal('real_profit', 10, 2, true);
             $table->foreignIdFor(BetableMatch::class, 'match_id')->constrained('matches')->onDelete('cascade');
             $table->timestamps();
         });
