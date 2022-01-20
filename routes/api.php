@@ -1,14 +1,11 @@
 <?php
 
-use App\Http\Controllers\BetableMatchController;
-use App\Http\Controllers\BetController;
-use App\Models\Bet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\BetableMatch;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\BetController;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Controllers\BetableMatchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +38,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::apiResource('matches.bets', BetController::class)
+        ->except('show')
         ->shallow()
         ->missing(function(Request $request) {
             return response(['message' => 'Bet not found.'], Response::HTTP_NOT_FOUND);
