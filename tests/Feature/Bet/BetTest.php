@@ -26,25 +26,34 @@ class BetTest extends TestCase
   /** @test */
   public function check_if_bet_can_be_created()
   {
+    $this->withoutExceptionHandling();
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
-    $this->postJson(
+    $response = $this->postJson(
       route("matches.bets.store", [
         "match" => $match->id,
         "winner_team" => 1,
         "odd" => 1.5,
-        "amount" => 25, // Reais
-        "currency" => "BRL",
+        "amount" => 25.0,
       ])
-    )
-      ->assertStatus(201)
-      ->assertJson(Bet::first()->toArray());
+      );
 
-    $this->assertDatabaseCount("bets", 1);
-    $this->assertDatabaseHas("bets", [
-      "winner_team" => 1,
-      "match_id" => $match->id,
-    ]);
+      $this->assertDatabaseCount("bets", 1);
+      $this->assertDatabaseHas("bets", [
+        "winner_team" => 1,
+        "profit" => 37.5,
+        "real_profit" => 12.5,
+        "match_id" => $match->id,
+      ]);
+      $response->assertStatus(201)
+      ->assertJson(
+        array_merge(Bet::first()->toArray(), [
+          "profit" => 37.5,
+          "real_profit" => 12.5,
+        ])
+      );
+
+      
   }
 
   /** @test */
