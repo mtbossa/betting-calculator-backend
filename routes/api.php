@@ -33,8 +33,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/{match}', [BetableMatchController::class, 'show'])->name('show')->missing(function(Request $request) {
             return response(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
         });
-        Route::put('/{match}', [BetableMatchController::class, 'update'])->name('update');
-        Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy');
+        Route::put('/{match}', [BetableMatchController::class, 'update'])->name('update')->missing(function(Request $request) {
+            return response(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+        });
+        Route::delete('/{match}', [BetableMatchController::class, 'destroy'])->name('destroy')->missing(function(Request $request) {
+            return response(['message' => 'Match not found.'], Response::HTTP_NOT_FOUND);
+        });
     });
 
     Route::apiResource('matches.bets', BetController::class)

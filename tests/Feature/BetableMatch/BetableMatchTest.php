@@ -216,8 +216,15 @@ class BetableMatchTest extends TestCase
   /** @test */
   public function ensure_correct_response_is_returned_when_betable_match_not_found()
   {
-    $this->withoutExceptionHandling();
     $this->get(route("betable_matches.show", 1))->assertJson([
+      "message" => "Match not found.",
+    ]);
+
+    $this->delete(route("betable_matches.destroy", 1))->assertJson([
+      "message" => "Match not found.",
+    ]);
+
+    $this->put(route("betable_matches.update", 1))->assertJson([
       "message" => "Match not found.",
     ]);
   }
