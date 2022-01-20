@@ -192,7 +192,7 @@ class BetableMatchTest extends TestCase
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
     Bet::factory()->create(["match_id" => $match->id]);
 
-    $this->delete(route("betable_matches.destroy", $match->id));
+    $this->delete(route("betable_matches.destroy", $match->id))->assertOk()->assertJson(['message' => 'Match deleted.']);
     $this->assertDatabaseMissing("bets", ["match_id" => $match->id]);
     $this->assertDeleted($match);
   }
