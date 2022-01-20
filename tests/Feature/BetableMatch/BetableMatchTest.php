@@ -87,7 +87,7 @@ class BetableMatchTest extends TestCase
 
     // Fetch single match
     $this->getJson(
-      route("betable_matches.show", [$match->id, "with_bets=true"])
+      route("betable_matches.show", [$match->id, "with_bets" => true])
     )
       ->assertJson($match->toArray())
       ->assertJsonPath("bets.0.odd", Bet::first()->odd);
@@ -229,5 +229,61 @@ class BetableMatchTest extends TestCase
     $this->put(route("betable_matches.update", 1))->assertJson([
       "message" => "Match not found.",
     ]);
+  }
+
+  /** @test */
+  public function newest_matches_must_always_be_first_by_default()
+  {
+    $match_1 = BetableMatch::factory()->create([
+      "user_id" => $this->user->id,
+      "created_at" => "2022-01-20T16:35:51.000000Z",
+    ]);
+    $match_2 = BetableMatch::factory()->create([
+      "user_id" => $this->user->id,
+      "created_at" => "2022-01-21T16:35:51.000000Z",
+    ]);
+
+    $this->getJson(route("betable_matches.index"))->assertJson([
+      $match_2->toArray(),
+      $match_1->toArray(),
+    ]);
+  }
+
+  /** @test */
+  public function when_all_matches_or_single_match_is_requested_with_bets_newest_must_come_first()
+  {
+    $match = BetableMatch::factory()->create([
+      "user_id" => $this->user->id,
+    ]);
+    $bet_1 = Bet::factory()->create([
+      "match_id" => $match->id,
+      "created_at" => "2022-01-20T16:35:51.000000Z",
+    ]);
+    $bet_2 = Bet::factory()->create([
+      "match_id" => $match->id,
+      "created_at" => "2022-01-21T16:35:51.000000Z",
+    ]);
+
+    // All matches
+    $response = $this->getJson(
+      route("betable_matches.index", ["with_bets" => "true"])
+    );
+    $expected = [
+      array_merge($match->toArray(), [
+        "bets" => [$bet_2->toArray(), $bet_1->toArray()],
+      ]),
+    ];
+    $response->assertJson($expected);
+
+    // Single match
+    $response = $this->getJson(
+      route("betable_matches.show", [$match->id, "with_bets" => "true"])
+    );
+    $expected = 
+      array_merge($match->toArray(), [
+        "bets" => [$bet_2->toArray(), $bet_1->toArray()],
+      ])
+    ;
+    $response->assertJson($expected);
   }
 }
