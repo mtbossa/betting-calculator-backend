@@ -45,8 +45,12 @@ class BetableMatchController extends Controller
     }
 
     if ($request->with_bets) {
+      $match = $match->load(['bets' => function ($query) {
+        $query->orderBy('created_at', 'desc');
+      }]);
+
       return response()->json(
-        $match->load("bets")->toArray(),
+        $match->toArray(),
         200,
         [],
         JSON_PRESERVE_ZERO_FRACTION
