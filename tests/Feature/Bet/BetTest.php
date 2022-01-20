@@ -36,24 +36,20 @@ class BetTest extends TestCase
         "odd" => 1.5,
         "amount" => 25.0,
       ])
-      );
-
-      $this->assertDatabaseCount("bets", 1);
-      $this->assertDatabaseHas("bets", [
-        "winner_team" => 1,
+    )->assertStatus(201)->assertJson(
+      array_merge(Bet::first()->toArray(), [
         "profit" => 37.5,
         "real_profit" => 12.5,
-        "match_id" => $match->id,
-      ]);
-      $response->assertStatus(201)
-      ->assertJson(
-        array_merge(Bet::first()->toArray(), [
-          "profit" => 37.5,
-          "real_profit" => 12.5,
-        ])
-      );
+      ])
+    );
 
-      
+    $this->assertDatabaseCount("bets", 1);
+    $this->assertDatabaseHas("bets", [
+      "winner_team" => 1,
+      "profit" => 37.5,
+      "real_profit" => 12.5,
+      "match_id" => $match->id,
+    ]);
   }
 
   /** @test */
