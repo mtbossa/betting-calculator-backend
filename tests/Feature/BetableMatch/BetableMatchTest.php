@@ -38,12 +38,16 @@ class BetableMatchTest extends TestCase
   }
 
   /** @test */
-  public function fetch_all_betable_matches()
+  public function fetch_all_betable_matches_and_only_users_matches_are_returned()
   {
     $matches = BetableMatch::factory(2)->create(["user_id" => $this->user->id]);
 
+    $user_2 = User::factory()->create();
+    BetableMatch::factory(2)->create(["user_id" => $user_2->id]);    
+
     $this->getJson(route("betable_matches.index"))
       ->assertJsonCount(2)
+      ->assertJsonMissingExact(['user_id' => $user_2->id])
       ->assertJson($matches->toArray());
   }
 
@@ -162,7 +166,6 @@ class BetableMatchTest extends TestCase
   {
     $this->withoutExceptionHandling();
     $this->get(route("betable_matches.show", 1))
-      ->assertJson(['message' => 'Match not found.']);
-    
+      ->assertJson(['message' => 'Match not found.']);    
   }
 }

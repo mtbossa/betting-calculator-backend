@@ -6,16 +6,17 @@ use App\Http\Requests\BetableMatchRequest;
 use App\Models\Bet;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BetableMatchController extends Controller
 {
   public function index(Request $request)
-  {
+  {  
     if ($request->with_bets) {
-      return BetableMatch::with("bets")->get();
+      return BetableMatch::with("bets")->where('user_id', Auth::user()->id)->get();
     }
 
-    return BetableMatch::all();
+    return BetableMatch::where('user_id', Auth::user()->id)->get();
   }
 
   public function store(BetableMatchRequest $request)
