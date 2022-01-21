@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Scopes\NewestFirstScope;
+use App\Traits\Multitenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BetableMatch extends Model
 {
-  use HasFactory;
+  use HasFactory, Multitenantable;
 
   protected $fillable = ["team_one", "team_two", "winner_team"];
 

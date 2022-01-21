@@ -26,14 +26,11 @@ class BetableMatchController extends Controller
 
   public function store(StoreBetableMatchRequest $request)
   {
-    $match = $request
-      ->user()
-      ->matches()
-      ->create([
-        "team_one" => $request->team_one,
-        "team_two" => $request->team_two,
-        "winner_team" => null,
-      ]);
+    $match = BetableMatch::create([
+      "team_one" => $request->team_one,
+      "team_two" => $request->team_two,
+      "winner_team" => null,
+    ]);
 
     return $match;
   }
@@ -69,7 +66,7 @@ class BetableMatchController extends Controller
         Response::HTTP_NOT_FOUND
       );
     }
-    
+
     $match->update($request->all());
 
     return $match;
