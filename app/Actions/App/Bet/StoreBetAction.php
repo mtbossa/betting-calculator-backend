@@ -5,6 +5,7 @@ namespace App\Actions\App\Bet;
 use App\Http\Requests\StoreBetRequest;
 use App\Models\Bet;
 use App\Models\BetableMatch;
+use Illuminate\Support\Facades\Auth;
 
 class StoreBetAction
 {
@@ -19,6 +20,7 @@ class StoreBetAction
       "amount" => $request->amount,
       "profit" => $profit,
       "real_profit" => $real_profit,
+      "user_id" => Auth::user()->id,
     ]);
   }
 }

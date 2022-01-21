@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(BetableMatch::class);
     }
+
+    public function bets()
+    {
+        return $this->hasMany(Bet::class);
+    }
 }

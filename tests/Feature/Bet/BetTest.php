@@ -35,7 +35,7 @@ class BetTest extends TestCase
         "amount" => 25.0,
       ])
     )
-      ->assertCreated()      
+      ->assertCreated()
       ->assertJson(
         array_merge(Bet::first()->toArray(), [
           "profit" => 37.5,
@@ -56,7 +56,10 @@ class BetTest extends TestCase
   public function check_if_bet_can_be_updated()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    $bet = Bet::factory()->create(["match_id" => $match->id]);
+    $bet = Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
 
     $update_values = [
       "odd" => 2,
@@ -74,11 +77,17 @@ class BetTest extends TestCase
   public function ensure_user_can_update_only_his_bet()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    Bet::factory()->create(["match_id" => $match->id]);
+    Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
 
     $user_2 = User::factory()->create();
     $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
-    $bet_2 = Bet::factory()->create(["match_id" => $match_2->id]);
+    $bet_2 = Bet::factory()->create([
+      "match_id" => $match_2->id,
+      "user_id" => $user_2->id,
+    ]);
 
     $update_values = [
       "odd" => 2,
@@ -96,7 +105,10 @@ class BetTest extends TestCase
   public function check_if_bet_can_be_deleted()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    $bet = Bet::factory()->create(["match_id" => $match->id]);
+    $bet = Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
 
     $this->delete(route("bets.destroy", ["bet" => $bet->id]))
       ->assertOk()
@@ -110,11 +122,17 @@ class BetTest extends TestCase
   public function ensure_user_can_delete_only_his_bet()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    Bet::factory()->create(["match_id" => $match->id]);
+    Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
 
     $user_2 = User::factory()->create();
     $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
-    $bet_2 = Bet::factory()->create(["match_id" => $match_2->id]);
+    $bet_2 = Bet::factory()->create([
+      "match_id" => $match_2->id,
+      "user_id" => $user_2->id,
+    ]);
 
     $this->delete(route("bets.destroy", ["bet" => $bet_2->id]))
       ->assertNotFound()
@@ -148,7 +166,10 @@ class BetTest extends TestCase
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
-    $bet = Bet::factory()->create(["match_id" => $match->id]);
+    $bet = Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
 
     $this->putJson(route("bets.update", ["bet" => $bet->id]), [
       "odd" => "",

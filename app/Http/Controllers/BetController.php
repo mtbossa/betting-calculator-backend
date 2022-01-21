@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateBetRequest;
 use App\Models\Bet;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class BetController extends Controller

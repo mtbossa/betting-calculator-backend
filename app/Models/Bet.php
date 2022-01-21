@@ -16,6 +16,7 @@ class Bet extends Model
     "amount",
     "profit",
     "real_profit",
+    "user_id",
   ];
 
   protected $casts = [
@@ -29,6 +30,11 @@ class Bet extends Model
   public function match()
   {
     return $this->belongsTo(BetableMatch::class, "match_id");
+  }
+
+  public function user()
+  {
+    return $this->belongsTo(User::class);
   }
 
   /**
