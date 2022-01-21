@@ -279,11 +279,9 @@ class BetableMatchTest extends TestCase
     $response = $this->getJson(
       route("betable_matches.show", [$match->id, "with_bets" => "true"])
     );
-    $expected = 
-      array_merge($match->toArray(), [
-        "bets" => [$bet_2->toArray(), $bet_1->toArray()],
-      ])
-    ;
+    $expected = array_merge($match->toArray(), [
+      "bets" => [$bet_2->toArray(), $bet_1->toArray()],
+    ]);
     $response->assertJson($expected);
   }
 }

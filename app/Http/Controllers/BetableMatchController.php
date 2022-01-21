@@ -14,21 +14,14 @@ class BetableMatchController extends Controller
   public function index(Request $request)
   {
     if ($request->with_bets) {
-      $matches = BetableMatch::with([
-        "bets" => function ($query) {
-          $query->orderBy("created_at", "desc");
-        },
-      ])
+      $matches = BetableMatch::with('bets')
         ->where("user_id", Auth::user()->id)
-        ->orderBy("created_at", "desc")
         ->get();
 
       return response()->json($matches, 200, [], JSON_PRESERVE_ZERO_FRACTION);
     }
 
-    return BetableMatch::where("user_id", Auth::user()->id)
-      ->orderBy("created_at", "desc")
-      ->get();
+    return BetableMatch::where("user_id", Auth::user()->id)->get();
   }
 
   public function store(BetableMatchRequest $request)
@@ -54,11 +47,7 @@ class BetableMatchController extends Controller
     }
 
     if ($request->with_bets) {
-      $match = $match->load([
-        "bets" => function ($query) {
-          $query->orderBy("created_at", "desc");
-        },
-      ]);
+      $match = $match->load('bets');
 
       return response()->json(
         $match->toArray(),

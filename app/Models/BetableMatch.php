@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NewestFirstScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,5 +22,15 @@ class BetableMatch extends Model
   public function bets()
   {
     return $this->hasMany(Bet::class, "match_id");
+  }
+
+  /**
+   * The "booted" method of the model.
+   *
+   * @return void
+   */
+  protected static function booted()
+  {
+    static::addGlobalScope(new NewestFirstScope());
   }
 }
