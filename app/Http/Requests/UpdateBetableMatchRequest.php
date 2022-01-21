@@ -24,8 +24,8 @@ class UpdateBetableMatchRequest extends FormRequest
     public function rules()
     {
         return [
-            'team_one' => 'max:50',
-            'team_two' => 'max:50',
+            'team_one' => 'max:20',
+            'team_two' => 'max:20',
             'winner_team' => 'numeric|integer|min:1|max:2',
         ];
     }

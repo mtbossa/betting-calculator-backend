@@ -14,8 +14,8 @@ class BetableMatchFactory extends Factory
   public function definition()
   {
     return [
-      "team_one" => $this->faker->company,
-      "team_two" => $this->faker->company,
+      "team_one" => $this->faker->text(20),
+      "team_two" => $this->faker->text(20),
       "winner_team" => null,
     ];
   }

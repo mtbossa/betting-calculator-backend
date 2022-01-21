@@ -24,8 +24,8 @@ class StoreBetableMatchRequest extends FormRequest
     public function rules()
     {
         return [
-            'team_one' => 'required|max:50',
-            'team_two' => 'required|max:50'
+            'team_one' => 'required|max:20',
+            'team_two' => 'required|max:20'
         ];
     }
 }
