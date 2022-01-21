@@ -9,14 +9,16 @@ trait Multitenantable
 {
   public static function bootMultitenantable()
   {
-    if (Auth::check()) {
-      static::creating(function ($model) {
+    static::creating(function ($model) {
+      if (Auth::check()) {
         $model->user_id = Auth::user()->id;
-      });
+      }
+    });
 
-      static::addGlobalScope("user_id", function (Builder $builder) {
+    static::addGlobalScope("user_id", function (Builder $builder) {
+      if (Auth::check()) {
         return $builder->where("user_id", Auth::user()->id);
-      });
-    }
+      }
+    });
   }
 }
