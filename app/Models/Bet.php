@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Scopes\NewestFirstScope;
+use App\Traits\Multitenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Bet extends Model
 {
-  use HasFactory;
+  use HasFactory, Multitenantable;
 
   protected $fillable = [
     "betted_team",

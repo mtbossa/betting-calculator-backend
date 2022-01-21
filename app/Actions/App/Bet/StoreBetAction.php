@@ -20,7 +20,6 @@ class StoreBetAction
       "amount" => $request->amount,
       "profit" => $profit,
       "real_profit" => $real_profit,
-      "user_id" => Auth::user()->id,
     ]);
   }
 }
