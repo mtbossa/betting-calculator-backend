@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BetableMatchRequest;
-use App\Models\Bet;
+use App\Http\Requests\StoreBetableMatchRequest;
+use App\Http\Requests\UpdateBetableMatchRequest;
 use App\Models\BetableMatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ class BetableMatchController extends Controller
   public function index(Request $request)
   {
     if ($request->with_bets) {
-      $matches = BetableMatch::with('bets')
+      $matches = BetableMatch::with("bets")
         ->where("user_id", Auth::user()->id)
         ->get();
 
@@ -24,7 +24,7 @@ class BetableMatchController extends Controller
     return BetableMatch::where("user_id", Auth::user()->id)->get();
   }
 
-  public function store(BetableMatchRequest $request)
+  public function store(StoreBetableMatchRequest $request)
   {
     $match = $request
       ->user()
@@ -32,6 +32,7 @@ class BetableMatchController extends Controller
       ->create([
         "team_one" => $request->team_one,
         "team_two" => $request->team_two,
+        "winner_team" => null,
       ]);
 
     return $match;
@@ -47,14 +48,7 @@ class BetableMatchController extends Controller
     }
 
     if ($request->with_bets) {
-      $match = $match->load('bets');
-
-      return response()->json(
-        $match->toArray(),
-        200,
-        [],
-        JSON_PRESERVE_ZERO_FRACTION
-      );
+      $match = $match->load("bets");
     }
 
     return response()->json(
@@ -65,18 +59,18 @@ class BetableMatchController extends Controller
     );
   }
 
-  public function update(BetableMatch $match, BetableMatchRequest $request)
-  {
+  public function update(
+    BetableMatch $match,
+    UpdateBetableMatchRequest $request
+  ) {
     if ($match->user_id !== $request->user()->id) {
       return response()->json(
         ["message" => "Match not found."],
         Response::HTTP_NOT_FOUND
       );
     }
-
-    $match->team_one = $request->team_one;
-    $match->team_two = $request->team_two;
-    $match->save();
+    
+    $match->update($request->all());
 
     return $match;
   }

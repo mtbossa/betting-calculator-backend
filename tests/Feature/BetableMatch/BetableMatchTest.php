@@ -108,20 +108,6 @@ class BetableMatchTest extends TestCase
         "team_one" => "The team one field is required.",
         "team_two" => "The team two field is required.",
       ]);
-
-    // Updating match
-    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
-    $update_values = [
-      "team_one" => "",
-      "team_two" => "",
-    ];
-
-    $this->putJson(route("betable_matches.update", $match->id), $update_values)
-      ->assertUnprocessable()
-      ->assertJsonValidationErrors([
-        "team_one" => "The team one field is required.",
-        "team_two" => "The team two field is required.",
-      ]);
   }
 
   /** @test */
@@ -163,6 +149,37 @@ class BetableMatchTest extends TestCase
       ->assertOk()
       ->assertJsonFragment($update_values);
     $this->assertDatabaseHas("matches", $update_values);
+  }
+
+  /** @test */
+  public function check_if_betable_match_can_be_finished()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $update_values = [
+      "winner_team" => 1,
+    ];
+
+    $this->putJson(route("betable_matches.update", $match->id), $update_values)
+      ->assertOk()
+      ->assertJsonFragment($update_values);
+    $this->assertDatabaseHas("matches", $update_values);
+  }
+
+  /** @test */
+  public function ensure_winner_team_is_either_int_one_or_two()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $update_values = [
+      "winner_team" => mt_rand(3, 10),
+    ];
+
+    $this->putJson(route("betable_matches.update", $match->id), $update_values)
+      ->assertUnprocessable()
+      ->assertJsonValidationErrorFor("winner_team");
+
+    $this->assertDatabaseMissing("matches", $update_values);
   }
 
   /** @test */

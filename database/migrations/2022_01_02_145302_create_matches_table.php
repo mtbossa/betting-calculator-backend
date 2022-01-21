@@ -18,6 +18,7 @@ class CreateMatchesTable extends Migration
             $table->id();
             $table->string('team_one');
             $table->string('team_two');
+            $table->tinyInteger('winner_team')->nullable();
             $table->foreignIdFor(User::class)->constrained();
             $table->timestamps();
         });

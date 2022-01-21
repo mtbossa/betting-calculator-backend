@@ -10,7 +10,7 @@ class BetableMatch extends Model
 {
   use HasFactory;
 
-  protected $fillable = ["team_one", "team_two"];
+  protected $fillable = ["team_one", "team_two", "winner_team"];
 
   protected $table = "matches";
 
