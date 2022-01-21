@@ -53,13 +53,6 @@ class BetController extends Controller
    */
   public function update(UpdateBetRequest $request, Bet $bet)
   {
-    if ($bet->match->user_id !== $request->user()->id) {
-      return response()->json(
-        ["message" => "Bet not found."],
-        Response::HTTP_NOT_FOUND
-      );
-    }
-
     $bet->update($request->all());
 
     return $bet;
@@ -73,13 +66,6 @@ class BetController extends Controller
    */
   public function destroy(Bet $bet, Request $request)
   {
-    if ($bet->match->user_id !== $request->user()->id) {
-      return response()->json(
-        ["message" => "Bet not found."],
-        Response::HTTP_NOT_FOUND
-      );
-    }
-
     $bet->delete();
 
     return ["message" => "Bet deleted."];

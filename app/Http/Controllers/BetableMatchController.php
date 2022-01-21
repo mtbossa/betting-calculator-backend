@@ -15,13 +15,12 @@ class BetableMatchController extends Controller
   {
     if ($request->with_bets) {
       $matches = BetableMatch::with("bets")
-        ->where("user_id", Auth::user()->id)
         ->get();
 
       return response()->json($matches, 200, [], JSON_PRESERVE_ZERO_FRACTION);
     }
 
-    return BetableMatch::where("user_id", Auth::user()->id)->get();
+    return BetableMatch::all();
   }
 
   public function store(StoreBetableMatchRequest $request)
@@ -37,13 +36,6 @@ class BetableMatchController extends Controller
 
   public function show(BetableMatch $match, Request $request)
   {
-    if ($match->user_id !== $request->user()->id) {
-      return response()->json(
-        ["message" => "Match not found."],
-        Response::HTTP_NOT_FOUND
-      );
-    }
-
     if ($request->with_bets) {
       $match = $match->load("bets");
     }
@@ -60,13 +52,6 @@ class BetableMatchController extends Controller
     BetableMatch $match,
     UpdateBetableMatchRequest $request
   ) {
-    if ($match->user_id !== $request->user()->id) {
-      return response()->json(
-        ["message" => "Match not found."],
-        Response::HTTP_NOT_FOUND
-      );
-    }
-
     $match->update($request->all());
 
     return $match;
@@ -74,13 +59,6 @@ class BetableMatchController extends Controller
 
   public function destroy(BetableMatch $match, Request $request)
   {
-    if ($match->user_id !== $request->user()->id) {
-      return response()->json(
-        ["message" => "Match not found."],
-        Response::HTTP_NOT_FOUND
-      );
-    }
-
     $match->delete();
 
     return response(["message" => "Match deleted."]);
