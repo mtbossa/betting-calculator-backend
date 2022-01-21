@@ -21,7 +21,6 @@ class AuthUserTest extends TestCase
 
     $response = $this->get('/api/user');
 
-
     $response->assertOk();
   }
 
