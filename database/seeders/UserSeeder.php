@@ -25,7 +25,10 @@ class UserSeeder extends Seeder
           ->sequence(["winner_team" => null], ["winner_team" => mt_rand(1, 2)])
           ->create(["user_id" => $user->id])
           ->each(function ($match) {
-            Bet::factory(6)->create(["match_id" => $match->id]);
+            Bet::factory(6)->create([
+              "match_id" => $match->id,
+              "user_id" => $match->user_id,
+            ]);
           });
       });
 
@@ -36,7 +39,10 @@ class UserSeeder extends Seeder
           ->sequence(["winner_team" => null], ["winner_team" => mt_rand(1, 2)])
           ->create(["user_id" => $user->id])
           ->each(function ($match) {
-            Bet::factory(6)->create(["match_id" => $match->id]);
+            Bet::factory(6)->create([
+              "match_id" => $match->id,
+              "user_id" => $match->user_id,
+            ]);
           });
       });
   }
