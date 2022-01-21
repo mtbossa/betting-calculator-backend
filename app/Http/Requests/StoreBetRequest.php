@@ -24,7 +24,7 @@ class StoreBetRequest extends FormRequest
     public function rules()
     {
         return [
-            'winner_team' => 'required',
+            'betted_team' => 'required|numeric|integer|min:1|max:2',
             'odd' => 'required',
             'amount' => 'required',
         ];

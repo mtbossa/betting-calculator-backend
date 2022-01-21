@@ -11,7 +11,7 @@ class Bet extends Model
   use HasFactory;
 
   protected $fillable = [
-    "winner_team",
+    "betted_team",
     "odd",
     "amount",
     "profit",
@@ -19,7 +19,7 @@ class Bet extends Model
   ];
 
   protected $casts = [
-    "winner_team" => "int",
+    "betted_team" => "int",
     "odd" => "float",
     "amount" => "float",
     "profit" => "float",

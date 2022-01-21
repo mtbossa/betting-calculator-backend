@@ -22,7 +22,7 @@ class BetFactory extends Factory
         $real_profit  = round($profit - $amount, 2);
         
         return [
-            'winner_team' => mt_rand(1, 2),
+            'betted_team' => mt_rand(1, 2),
             'odd' => $odd,
             'amount' => $amount,
             'profit' => $profit,

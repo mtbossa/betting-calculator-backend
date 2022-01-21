@@ -14,7 +14,7 @@ class StoreBetAction
     $real_profit = $profit - $request->amount;
 
     return $match->bets()->create([
-      "winner_team" => $request->winner_team,
+      "betted_team" => $request->betted_team,
       "odd" => $request->odd,
       "amount" => $request->amount,
       "profit" => $profit,

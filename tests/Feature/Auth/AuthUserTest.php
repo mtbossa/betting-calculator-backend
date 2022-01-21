@@ -37,6 +37,7 @@ class AuthUserTest extends TestCase
   /** @test */
   public function user_can_register()
   {
+    $this->withoutExceptionHandling();
     $response = $this->postJson('/register', [
       'name' => 'mateus',
       'email' => 'test@test.com',

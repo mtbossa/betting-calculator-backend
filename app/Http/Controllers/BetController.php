@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\App\Bet\StoreBetAction;
-use App\Http\Requests\BetRequest;
 use App\Http\Requests\StoreBetRequest;
 use App\Http\Requests\UpdateBetRequest;
 use App\Models\Bet;
@@ -32,9 +31,9 @@ class BetController extends Controller
   public function store(
     BetableMatch $match,
     StoreBetRequest $request,
-    StoreBetAction $bet_action
+    StoreBetAction $action
   ) {
-    $bet = $bet_action->handle($match, $request);
+    $bet = $action->handle($match, $request);
 
     return response()->json(
       $bet,
@@ -60,9 +59,7 @@ class BetController extends Controller
       );
     }
 
-    $bet->odd = $request->odd;
-    $bet->amount = $request->amount;
-    $bet->save();
+    $bet->update($request->all());
 
     return $bet;
   }

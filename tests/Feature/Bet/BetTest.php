@@ -25,18 +25,17 @@ class BetTest extends TestCase
   /** @test */
   public function check_if_bet_can_be_created()
   {
-    $this->withoutExceptionHandling();
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
     $response = $this->postJson(
       route("matches.bets.store", [
         "match" => $match->id,
-        "winner_team" => 1,
+        "betted_team" => 1,
         "odd" => 1.5,
         "amount" => 25.0,
       ])
     )
-      ->assertStatus(201)
+      ->assertCreated()      
       ->assertJson(
         array_merge(Bet::first()->toArray(), [
           "profit" => 37.5,
@@ -46,7 +45,7 @@ class BetTest extends TestCase
 
     $this->assertDatabaseCount("bets", 1);
     $this->assertDatabaseHas("bets", [
-      "winner_team" => 1,
+      "betted_team" => 1,
       "profit" => 37.5,
       "real_profit" => 12.5,
       "match_id" => $match->id,
@@ -125,7 +124,7 @@ class BetTest extends TestCase
   }
 
   /** @test */
-  public function odd_winner_team_and_amount_are_required_on_creation()
+  public function odd_betted_team_and_amount_are_required_on_creation()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -133,19 +132,19 @@ class BetTest extends TestCase
     $this->postJson(
       route("matches.bets.store", [
         "match" => $match->id,
-        "winner_team" => "",
+        "betted_team" => "",
         "odd" => "",
         "amount" => "",
       ])
     )->assertJsonValidationErrors([
-      "winner_team" => "The winner team field is required.",
+      "betted_team" => "The betted team field is required.",
       "odd" => "The odd field is required.",
       "amount" => "The amount field is required.",
     ]);
   }
 
   /** @test */
-  public function winner_team_and_currency_are_not_required_when_updating()
+  public function betted_team_and_currency_are_not_required_when_updating()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -155,7 +154,7 @@ class BetTest extends TestCase
       "odd" => "",
       "amount" => "",
     ])
-      ->assertJsonMissingValidationErrors(["winner_team"])
+      ->assertJsonMissingValidationErrors(["betted_team"])
       ->assertJsonValidationErrors(["odd", "amount"]);
   }
 
