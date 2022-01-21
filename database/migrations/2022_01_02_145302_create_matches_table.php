@@ -16,9 +16,9 @@ class CreateMatchesTable extends Migration
     {
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
-            $table->string('team_one');
-            $table->string('team_two');
-            $table->tinyInteger('winner_team')->nullable();
+            $table->string('team_one', 50);
+            $table->string('team_two', 50);
+            $table->tinyInteger('winner_team', false, true)->nullable();
             $table->foreignIdFor(User::class)->constrained();
             $table->timestamps();
         });
