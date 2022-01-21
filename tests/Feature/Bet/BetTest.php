@@ -6,6 +6,7 @@ use App\Models\Bet;
 use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -18,7 +19,6 @@ class BetTest extends TestCase
   public function setUp(): void
   {
     parent::setUp();
-
     $this->user = Sanctum::actingAs(User::factory()->create(), ["*"]);
   }
 
@@ -76,6 +76,8 @@ class BetTest extends TestCase
   /** @test */
   public function ensure_user_can_update_only_his_bet()
   {
+    Event::fake(); // Need for creating model with other user_id
+
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
     Bet::factory()->create([
       "match_id" => $match->id,
@@ -84,6 +86,7 @@ class BetTest extends TestCase
 
     $user_2 = User::factory()->create();
     $match_2 = BetableMatch::factory()->create(["user_id" => $user_2->id]);
+
     $bet_2 = Bet::factory()->create([
       "match_id" => $match_2->id,
       "user_id" => $user_2->id,
@@ -121,6 +124,8 @@ class BetTest extends TestCase
   /** @test */
   public function ensure_user_can_delete_only_his_bet()
   {
+    Event::fake();
+
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
     Bet::factory()->create([
       "match_id" => $match->id,

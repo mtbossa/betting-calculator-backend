@@ -7,6 +7,7 @@ use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -40,6 +41,7 @@ class BetableMatchTest extends TestCase
   /** @test */
   public function fetch_all_betable_matches_and_only_users_matches_are_returned()
   {
+    Event::fake();
     $matches = BetableMatch::factory(2)->create(["user_id" => $this->user->id]);
 
     $user_2 = User::factory()->create();
@@ -64,6 +66,7 @@ class BetableMatchTest extends TestCase
   /** @test */
   public function ensure_user_can_fetch_only_his_match()
   {
+    Event::fake();
     // User 1 Match
     BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -185,6 +188,7 @@ class BetableMatchTest extends TestCase
   /** @test */
   public function ensure_user_can_updated_only_his_match()
   {
+    Event::fake();
     // User 1 Match
     BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -219,6 +223,8 @@ class BetableMatchTest extends TestCase
   /** @test */
   public function ensure_user_can_delete_only_his_match()
   {
+    Event::fake();
+    
     // User 1 Match
     BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
