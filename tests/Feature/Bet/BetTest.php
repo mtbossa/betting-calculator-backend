@@ -166,7 +166,7 @@ class BetTest extends TestCase
   }
 
   /** @test */
-  public function betted_team_and_currency_are_not_required_when_updating()
+  public function betted_team_is_not_required_when_updating()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -196,7 +196,7 @@ class BetTest extends TestCase
   }
 
   /** @test */
-  public function when_receive_odd_or_amount_with_more_than_two_decimals_convert_to_two()
+  public function when_receive_odd_or_amount_with_more_than_two_decimals_convert_to_two_and_rounded_up()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
 
@@ -210,5 +210,80 @@ class BetTest extends TestCase
       "odd" => 1.56,
       "amount" => 25.1,
     ]);
+  }
+
+  /** @test */
+  public function ensure_betted_team_is_either_int_one_or_two()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $this->postJson(
+      route("matches.bets.store", [
+        "match" => $match->id,
+      ]),
+      ["betted_team" => 3]
+    )->assertJsonValidationErrors("betted_team");
+  }
+
+  /** @test */
+  public function ensure_odd_and_amount_are_numeric()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $this->postJson(
+      route("matches.bets.store", [
+        "match" => $match->id,
+      ]),
+      ["betted_team" => 1, "odd" => "12a", "amount" => "aaa43.5"]
+    )->assertJsonValidationErrors(["odd", "amount"]);
+  }
+
+  /** @test */
+  public function ensure_odd_and_amount_digits_are_between_1_and_10()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $this->postJson(
+      route("matches.bets.store", [
+        "match" => $match->id,
+      ]),
+      ["betted_team" => 1, "odd" => 12345678910, "amount" => 12345678910]
+    )->assertJsonValidationErrors([
+      "odd" => "The odd must be between 1 and 10 digits.",
+      "amount" => "The amount must be between 1 and 10 digits.",
+    ]);
+
+    $bet = Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
+
+    $this->putJson(
+      route("bets.update", [
+        "bet" => $bet->id,
+      ]),
+      ["odd" => 12345678910, "amount" => 12345678910]
+    )->assertJsonValidationErrors([
+      "odd" => "The odd must be between 1 and 10 digits.",
+      "amount" => "The amount must be between 1 and 10 digits.",
+    ]);
+  }
+
+  /** @test */
+  public function odd_and_amount_are_not_required_when_updating()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $bet = Bet::factory()->create([
+      "match_id" => $match->id,
+      "user_id" => $this->user->id,
+    ]);
+
+    $this->putJson(
+      route("bets.update", [
+        "bet" => $bet->id,
+      ]),
+      []
+    )->assertJsonMissingValidationErrors(["odd", "amount"]);
   }
 }
