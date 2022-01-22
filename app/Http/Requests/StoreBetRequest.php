@@ -25,8 +25,8 @@ class StoreBetRequest extends FormRequest
   {
     return [
       "betted_team" => "required|numeric|integer|min:1|max:2",
-      "odd" => "required|digits_between:1,10",
-      "amount" => "required|digits_between:1,10",
+      "odd" => "required|numeric|max:9999999999.99",
+      "amount" => "required|numeric|max:9999999999.99",
     ];
   }
 }

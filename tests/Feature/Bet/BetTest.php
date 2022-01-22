@@ -247,10 +247,10 @@ class BetTest extends TestCase
       route("matches.bets.store", [
         "match" => $match->id,
       ]),
-      ["betted_team" => 1, "odd" => 12345678910, "amount" => 12345678910]
+      ["betted_team" => 1, "odd" => 10000000000.99, "amount" => 10000000000.99]
     )->assertJsonValidationErrors([
-      "odd" => "The odd must be between 1 and 10 digits.",
-      "amount" => "The amount must be between 1 and 10 digits.",
+      "odd" ,
+      "amount",
     ]);
 
     $bet = Bet::factory()->create([
@@ -262,10 +262,10 @@ class BetTest extends TestCase
       route("bets.update", [
         "bet" => $bet->id,
       ]),
-      ["odd" => 12345678910, "amount" => 12345678910]
+      ["odd" => 10000000000.99, "amount" => 10000000000.99]
     )->assertJsonValidationErrors([
-      "odd" => "The odd must be between 1 and 10 digits.",
-      "amount" => "The amount must be between 1 and 10 digits.",
+      "odd",
+      "amount",
     ]);
   }
 

@@ -24,8 +24,8 @@ class UpdateBetRequest extends FormRequest
   public function rules()
   {
     return [
-      "odd" => "digits_between:1,10",
-      "amount" => "digits_between:1,10",
+      "odd" => "numeric|max:9999999999.99",
+      "amount" => "numeric|max:9999999999.99",
     ];
   }
 }
