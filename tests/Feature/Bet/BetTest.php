@@ -7,6 +7,7 @@ use App\Models\BetableMatch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -30,10 +31,8 @@ class BetTest extends TestCase
     $response = $this->postJson(
       route("matches.bets.store", [
         "match" => $match->id,
-        "betted_team" => 1,
-        "odd" => 1.5,
-        "amount" => 25.0,
-      ])
+      ]),
+      ["betted_team" => 1, "odd" => 1.5, "amount" => 25.0]
     )
       ->assertCreated()
       ->assertJson(
@@ -193,6 +192,23 @@ class BetTest extends TestCase
 
     $this->put(route("bets.update", 1))->assertJson([
       "message" => "Bet not found.",
+    ]);
+  }
+
+  /** @test */
+  public function when_receive_odd_or_amount_with_more_than_two_decimals_convert_to_two()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $this->postJson(
+      route("matches.bets.store", [
+        "match" => $match->id,
+      ]),
+      ["betted_team" => 1, "odd" => 1.5590004, "amount" => 25.10005]
+    )->assertJson([
+      "betted_team" => 1,
+      "odd" => 1.56,
+      "amount" => 25.1,
     ]);
   }
 }
