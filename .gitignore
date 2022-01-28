@@ -4,6 +4,8 @@
 /storage/*.key
 /vendor
 .env
+.env.vue
+.env.angular
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
