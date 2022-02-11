@@ -28,11 +28,12 @@ class StoreBetAction
 
   private function calcProfit(float $odd, float $amount): float
   {
-    return $odd * $amount;
+    return round($odd * $amount, 2);
   }
 
   private function calcRealProfit(float $profit, float $amount): float
   {
+
     return $profit - $amount;
   }
 }

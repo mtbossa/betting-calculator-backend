@@ -286,4 +286,25 @@ class BetTest extends TestCase
       []
     )->assertJsonMissingValidationErrors(["odd", "amount"]);
   }
+
+  /** @test */
+  public function ensure_profit_and_real_profit_are_always_rounded_up()
+  {
+    $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
+
+    $response = $this->postJson(
+      route("matches.bets.store", [
+        "match" => $match->id,
+      ]),
+      ["betted_team" => 1, "odd" => 1.48, "amount" => 23.53]
+    );
+
+    $this->assertDatabaseCount("bets", 1);
+    $this->assertDatabaseHas("bets", [
+      "betted_team" => 1,
+      "profit" => 34.82,
+      "real_profit" => 11.29,
+      "match_id" => $match->id,
+    ]);
+  }
 }
