@@ -13,14 +13,24 @@ class BetableMatchController extends Controller
 {
   public function index(Request $request)
   {
-    if ($request->with_bets) {
-      $matches = BetableMatch::with("bets")
-        ->get();
+    $query = BetableMatch::query();
 
-      return response()->json($matches, 200, [], JSON_PRESERVE_ZERO_FRACTION);
+    $query->when($request->boolean('with_bets'), function ($q) {
+      $q->with('bets');
+    });
+    if($request->has('match_finished')) {
+      $match_finished = $request->boolean('match_finished');
+      $query->when($match_finished, function ($q) {
+        $q->where('winner_team', '!=', null );
+      });
+      $query->when(!$match_finished, function ($q) {
+        $q->where('winner_team', null);
+      });
     }
 
-    return BetableMatch::all();
+    $matches = $query->get();
+
+    return response()->json($matches, 200, [], JSON_PRESERVE_ZERO_FRACTION);
   }
 
   public function store(StoreBetableMatchRequest $request)

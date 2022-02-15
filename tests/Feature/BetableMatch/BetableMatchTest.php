@@ -102,6 +102,32 @@ class BetableMatchTest extends TestCase
   }
 
   /** @test */
+  public function filter_only_finished_matches()
+  {
+    $this->withoutExceptionHandling();
+
+    BetableMatch::factory(2)->create(["user_id" => $this->user->id]);
+    BetableMatch::factory(4)->create(["user_id" => $this->user->id, 'winner_team' => 2]);
+
+    $response = $this->getJson(route('betable_matches.index', ['match_finished' => true, 'with_bets' => true]))
+      ->assertJsonCount(4)
+      ->assertJsonFragment(['winner_team' => 2]);
+  }
+
+  /** @test */
+  public function filter_only_ongoing_matches()
+  {
+    $this->withoutExceptionHandling();
+
+    BetableMatch::factory(2)->create(["user_id" => $this->user->id]);
+    BetableMatch::factory(4)->create(["user_id" => $this->user->id, 'winner_team' => 2]);
+
+    $response = $this->getJson(route('betable_matches.index', ['match_finished' => false, 'with_bets' => true]))
+      ->assertJsonCount(2)
+      ->assertJsonFragment(['winner_team'=> null]);
+  }
+
+  /** @test */
   public function check_if_betable_match_can_be_updated()
   {
     $match = BetableMatch::factory()->create(["user_id" => $this->user->id]);
