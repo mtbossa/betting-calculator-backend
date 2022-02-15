@@ -5,30 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBetableMatchRequest;
 use App\Http\Requests\UpdateBetableMatchRequest;
 use App\Models\BetableMatch;
+use App\Services\BetableMatchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class BetableMatchController extends Controller
 {
-  public function index(Request $request)
+  public function index(Request $request, BetableMatchService $service)
   {
-    $query = BetableMatch::query();
-
-    $query->when($request->boolean('with_bets'), function ($q) {
-      $q->with('bets');
-    });
-    if($request->has('match_finished')) {
-      $match_finished = $request->boolean('match_finished');
-      $query->when($match_finished, function ($q) {
-        $q->where('winner_team', '!=', null );
-      });
-      $query->when(!$match_finished, function ($q) {
-        $q->where('winner_team', null);
-      });
-    }
-
-    $matches = $query->get();
+    $matches = $service->index($request);
 
     return response()->json($matches, 200, [], JSON_PRESERVE_ZERO_FRACTION);
   }
